@@ -1,0 +1,40 @@
+import { z } from 'zod';
+
+// CREATE DTO for driver_rate — validated business fields only.
+export const CreateDriverRateSchema = z.object({
+  contractingOfficeId: z.number(),
+  vendorId: z.number(),
+  vendorName: z.string().optional().nullable(),
+  defaultRateType: z.string().optional().nullable(),
+  dailyRate: z.number().optional().nullable(),
+  hourlyRate: z.number().optional().nullable(),
+  overtimeHourlyRate: z.number().optional().nullable(),
+  dailyAllowance: z.number().optional().nullable(),
+  perKmRate: z.number().optional().nullable(),
+  perExtraKmRate: z.number().optional().nullable(),
+  nightHaltRate: z.number().optional().nullable(),
+  perTripRate: z.number().optional().nullable(),
+  tripAllowance: z.number().optional().nullable(),
+  incentivePerTrip: z.number().optional().nullable(),
+  monthlySal: z.number().optional().nullable(),
+  monthlyIncentive: z.number().optional().nullable(),
+  perTripPenaltyPercent: z.number().optional().nullable(),
+  perTripPenaltyFixedAmount: z.number().optional().nullable(),
+  startDate: z.coerce.date().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
+  active: z.boolean().optional().nullable(),
+  status: z.string(),
+  note: z.string().optional().nullable(),
+  versionNo: z.number().optional().nullable(),
+  isCurrent: z.boolean().optional().nullable(),
+  supersededBy: z.number().optional().nullable(),
+  approvalStatus: z.string().optional().nullable(),
+  approvedBy: z.number().optional().nullable(),
+  rejectionReason: z.string().optional().nullable(),
+  effectiveFrom: z.coerce.date().optional().nullable(),
+  effectiveUntil: z.coerce.date().optional().nullable(),
+  changeSummary: z.string().optional().nullable(),
+  previousVersionId: z.number(),
+});
+
+export type CreateDriverRateDto = z.infer<typeof CreateDriverRateSchema>;

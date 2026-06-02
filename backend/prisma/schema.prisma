@@ -1,0 +1,3192 @@
+// ─────────────────────────────────────────────────────────────
+// TMS Platform — Prisma schema (auto-generated from TMS Excel spec)
+// 100 tables · 62 master + 38 transaction/log
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// ═══════════════════ MODULE: AUDIT ═══════════════════
+
+model ActivityLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  userId Int? @map("user_id")
+  action String?
+  tableName String? @map("table_name")
+  recordId BigInt? @map("record_id")
+  oldValuesJson Json? @map("old_values_json")
+  newValuesJson Json? @map("new_values_json")
+  ipAddress String? @map("ip_address")
+  deviceInfo String? @map("device_info")
+  browserInfo String? @map("browser_info")
+  sessionId String? @map("session_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("masterdata_activity_logs")
+}
+
+model ApprovalActionLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  requestId Int? @map("request_id")
+  stepId Int? @map("step_id")
+  actionBy Int? @map("action_by")
+  action String?
+  actionAt DateTime? @map("action_at")
+  remarks String?
+  previousStatus String? @map("previous_status")
+  newStatus String? @map("new_status")
+  ipAddress String? @map("ip_address")
+  deviceInfo String? @map("device_info")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_approval_action_logs")
+}
+
+model ApprovalRequests {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  workflowId Int? @map("workflow_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  referenceCode String? @map("reference_code")
+  requestedBy Int? @map("requested_by")
+  requestedAt DateTime? @map("requested_at")
+  currentStep Int? @map("current_step")
+  totalSteps Int? @map("total_steps")
+  status String?
+  priority String?
+  dueDate DateTime? @map("due_date")
+  remarks String?
+  completedAt DateTime? @map("completed_at")
+  completedBy Int? @map("completed_by")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_approval_requests")
+}
+
+model ApprovalSteps {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  requestId Int? @map("request_id")
+  stepNumber Int? @map("step_number")
+  stepName String? @map("step_name")
+  approverType String? @map("approver_type")
+  approverUserId Int? @map("approver_user_id")
+  approverRoleId Int? @map("approver_role_id")
+  assignedAt DateTime? @map("assigned_at")
+  dueAt DateTime? @map("due_at")
+  actedBy Int? @map("acted_by")
+  action String?
+  actedAt DateTime? @map("acted_at")
+  remarks String?
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_approval_steps")
+}
+
+model DashboardWidgets {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  dashboardId Int? @map("dashboard_id")
+  widgetKey String? @map("widget_key")
+  widgetName String? @map("widget_name")
+  widgetType String? @map("widget_type")
+  dataSource String? @map("data_source")
+  refreshSeconds Int? @map("refresh_seconds")
+  positionX Int? @map("position_x")
+  positionY Int? @map("position_y")
+  width Int?
+  height Int?
+  config Json?
+  sortOrder Int? @map("sort_order")
+  isVisible Boolean? @map("is_visible")
+  featureFlagKey String? @map("feature_flag_key")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_dashboard_widgets")
+}
+
+model Dashboards {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  name String?
+  slug String?
+  description String?
+  scope String?
+  roleId Int? @map("role_id")
+  userId Int? @map("user_id")
+  isDefault Boolean? @map("is_default")
+  layoutConfig Json? @map("layout_config")
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_dashboards")
+}
+
+model ScheduledJobs {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  jobName String? @map("job_name")
+  cronExpression String? @map("cron_expression")
+  jobHandler String? @map("job_handler")
+  retryAttempts Int? @map("retry_attempts")
+  lastRunAt DateTime? @map("last_run_at")
+  nextRunAt DateTime? @map("next_run_at")
+  lastRunStatus String? @map("last_run_status")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_scheduled_jobs")
+}
+
+
+// ═══════════════════ MODULE: CONFIG ═══════════════════
+
+model IncidentActionMaster {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  incidentTypeId Int? @map("incident_type_id")
+  actionCode String? @map("action_code")
+  actionName String? @map("action_name")
+  description String?
+  defaultSlaHours Int? @map("default_sla_hours")
+  isMandatory Boolean? @map("is_mandatory")
+  sequenceOrder Int? @map("sequence_order")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  updatedBy Int? @map("updated_by")
+  @@index([tenantId])
+  @@map("masterdata_incident_action_master")
+}
+
+model IncidentTypeMaster {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  incidentCode String? @map("incident_code")
+  incidentName String? @map("incident_name")
+  severityDefault String? @map("severity_default")
+  requiresPhoto Boolean? @map("requires_photo")
+  requiresPoliceDoc Boolean? @map("requires_police_doc")
+  requiresRtoDoc Boolean? @map("requires_rto_doc")
+  requiresCustomerApproval Boolean? @map("requires_customer_approval")
+  isClaimApplicable Boolean? @map("is_claim_applicable")
+  autoHoldShipment Boolean? @map("auto_hold_shipment")
+  description String?
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_incident_type_master")
+}
+
+model NumberSeriesConfig {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  entityType String? @map("entity_type")
+  prefix String?
+  financialYear String? @map("financial_year")
+  currentRunningNo Int? @map("current_running_no")
+  minDigits Int? @map("min_digits")
+  suffix String?
+  separator String?
+  resetType String? @map("reset_type")
+  lastResetAt DateTime? @map("last_reset_at")
+  isActive Boolean? @map("is_active")
+  exampleOutput String? @map("example_output")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_number_series_config")
+}
+
+model PrintTemplates {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  templateType Int? @map("template_type")
+  templateName String? @map("template_name")
+  templateCode String? @map("template_code")
+  paperSize String? @map("paper_size")
+  orientation String?
+  copies Int?
+  templateHtml String? @map("template_html")
+  variablesSchema Json? @map("variables_schema")
+  includeLogo Boolean? @map("include_logo")
+  includeStamp Boolean? @map("include_stamp")
+  isActive Boolean? @map("is_active")
+  versionNo Int? @map("version_no")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_print_templates")
+}
+
+model ReasonMaster {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  moduleName String? @map("module_name")
+  reasonType String? @map("reason_type")
+  reasonCode String? @map("reason_code")
+  reasonText String? @map("reason_text")
+  requiresNote Boolean? @map("requires_note")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_reason_master")
+}
+
+model StatusAutomationRules {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  ruleName String? @map("rule_name")
+  triggerEvent String? @map("trigger_event")
+  targetEntity String? @map("target_entity")
+  targetStatus String? @map("target_status")
+  conditionJson Json? @map("condition_json")
+  autoNotifyCustomer Boolean? @map("auto_notify_customer")
+  notificationEventCode String? @map("notification_event_code")
+  createLrStateLog Boolean? @map("create_lr_state_log")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_status_automation_rules")
+}
+
+model StatusMaster {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  moduleName String? @map("module_name")
+  statusCode String? @map("status_code")
+  statusName String? @map("status_name")
+  colorCode String? @map("color_code")
+  textColor String? @map("text_color")
+  sequenceNo Int? @map("sequence_no")
+  isFinalStatus Boolean? @map("is_final_status")
+  isDefault Boolean? @map("is_default")
+  description String?
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_status_master")
+}
+
+
+// ═══════════════════ MODULE: FINANCE ═══════════════════
+
+model FuelLog {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  tripId BigInt? @map("trip_id")
+  vehicleId Int? @map("vehicle_id")
+  driverId Int? @map("driver_id")
+  fuelDate DateTime? @map("fuel_date")
+  pumpName String? @map("pump_name")
+  fuelType String? @map("fuel_type")
+  quantityLiters Decimal? @map("quantity_liters") @db.Decimal(14, 3)
+  ratePerLiter Decimal? @map("rate_per_liter") @db.Decimal(14, 3)
+  totalAmount Decimal? @map("total_amount") @db.Decimal(14, 3)
+  meterReading Int? @map("meter_reading")
+  billUrl String? @map("bill_url")
+  isCompanyPaid Boolean? @map("is_company_paid")
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_fm_fuel_log")
+}
+
+model LoaderExpense {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  officeId Int? @map("office_id")
+  manifestId BigInt? @map("manifest_id")
+  tripId BigInt? @map("trip_id")
+  expenseDate DateTime? @map("expense_date")
+  loaderType String? @map("loader_type")
+  numLoaders Int? @map("num_loaders")
+  numHours Decimal? @map("num_hours") @db.Decimal(14, 3)
+  numPackages Int? @map("num_packages")
+  rateType String? @map("rate_type")
+  rate Decimal? @db.Decimal(14, 3)
+  totalAmount Decimal? @map("total_amount") @db.Decimal(14, 3)
+  paidBy String? @map("paid_by")
+  paymentRef String? @map("payment_ref")
+  billUrl String? @map("bill_url")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_fm_loader_expense")
+}
+
+model CustomerInvoice {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  invoiceNo String? @map("invoice_no")
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  billingOfficeId Int? @map("billing_office_id")
+  customerId Int? @map("customer_id")
+  invoiceType String? @map("invoice_type")
+  invoiceDate DateTime? @map("invoice_date")
+  dueDate DateTime? @map("due_date")
+  periodFrom DateTime? @map("period_from")
+  periodTo DateTime? @map("period_to")
+  numLrs Int? @map("num_lrs")
+  subTotal Decimal? @map("sub_total") @db.Decimal(14, 3)
+  totalSgst Decimal? @map("total_sgst") @db.Decimal(14, 3)
+  totalCgst Decimal? @map("total_cgst") @db.Decimal(14, 3)
+  totalIgst Decimal? @map("total_igst") @db.Decimal(14, 3)
+  grandTotal Decimal? @map("grand_total") @db.Decimal(14, 3)
+  tdsRate Decimal? @map("tds_rate") @db.Decimal(14, 3)
+  tdsAmount Decimal? @map("tds_amount") @db.Decimal(14, 3)
+  invoiceStatus String? @map("invoice_status")
+  paymentReceived Decimal? @map("payment_received") @db.Decimal(14, 3)
+  pdfUrl String? @map("pdf_url")
+  emailSentAt DateTime? @map("email_sent_at")
+  isGstInvoice Boolean? @map("is_gst_invoice")
+  referenceInvoiceId BigInt? @map("reference_invoice_id")
+  sapSyncStatus String? @map("sap_sync_status")
+  sapDocumentNo String? @map("sap_document_no")
+  sapSyncError String? @map("sap_sync_error")
+  sapSyncedAt DateTime? @map("sap_synced_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  deletedBy Int? @map("deleted_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  @@index([tenantId])
+  @@map("tms_txn_customer_invoice")
+}
+
+model CustomerInvoiceItems {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  invoiceId BigInt? @map("invoice_id")
+  lrId BigInt? @map("lr_id")
+  podId BigInt? @map("pod_id")
+  lrNo String? @map("lr_no")
+  lrDate DateTime? @map("lr_date")
+  fromPlace String? @map("from_place")
+  toPlace String? @map("to_place")
+  numPackages Int? @map("num_packages")
+  weightKg Decimal? @map("weight_kg") @db.Decimal(14, 3)
+  freightCharges Decimal? @map("freight_charges") @db.Decimal(14, 3)
+  otherCharges Decimal? @map("other_charges") @db.Decimal(14, 3)
+  totalCharges Decimal? @map("total_charges") @db.Decimal(14, 3)
+  sgstRate Decimal? @map("sgst_rate") @db.Decimal(14, 3)
+  cgstRate Decimal? @map("cgst_rate") @db.Decimal(14, 3)
+  igstRate Decimal? @map("igst_rate") @db.Decimal(14, 3)
+  sgstAmount Decimal? @map("sgst_amount") @db.Decimal(14, 3)
+  cgstAmount Decimal? @map("cgst_amount") @db.Decimal(14, 3)
+  igstAmount Decimal? @map("igst_amount") @db.Decimal(14, 3)
+  lineTotal Decimal? @map("line_total") @db.Decimal(14, 3)
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_customer_invoice_items")
+}
+
+model VendorVoucher {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  voucherNo String? @map("voucher_no")
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  vendorId Int? @map("vendor_id")
+  tripId BigInt? @map("trip_id")
+  manifestId BigInt? @map("manifest_id")
+  voucherDate DateTime? @map("voucher_date")
+  voucherType String? @map("voucher_type")
+  hireCharges Decimal? @map("hire_charges") @db.Decimal(14, 3)
+  advanceDeduction Decimal? @map("advance_deduction") @db.Decimal(14, 3)
+  loadingCharges Decimal? @map("loading_charges") @db.Decimal(14, 3)
+  fuelDeduction Decimal? @map("fuel_deduction") @db.Decimal(14, 3)
+  penaltyAmount Decimal? @map("penalty_amount") @db.Decimal(14, 3)
+  penaltyRemarks String? @map("penalty_remarks")
+  otherDeductions Decimal? @map("other_deductions") @db.Decimal(14, 3)
+  grossAmount Decimal? @map("gross_amount") @db.Decimal(14, 3)
+  netAmount Decimal? @map("net_amount") @db.Decimal(14, 3)
+  gstApplicable Boolean? @map("gst_applicable")
+  tdsRate Decimal? @map("tds_rate") @db.Decimal(14, 3)
+  tdsAmount Decimal? @map("tds_amount") @db.Decimal(14, 3)
+  payableAmount Decimal? @map("payable_amount") @db.Decimal(14, 3)
+  paymentMode String? @map("payment_mode")
+  utrNumber String? @map("utr_number")
+  paidAt DateTime? @map("paid_at")
+  voucherStatus String? @map("voucher_status")
+  approvedBy Int? @map("approved_by")
+  pdfUrl String? @map("pdf_url")
+  sapSyncStatus String? @map("sap_sync_status")
+  sapDocumentNo String? @map("sap_document_no")
+  sapSyncError String? @map("sap_sync_error")
+  sapSyncedAt DateTime? @map("sap_synced_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  deletedBy Int? @map("deleted_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  @@index([tenantId])
+  @@map("tms_txn_vendor_voucher")
+}
+
+model VendorVoucherItems {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  voucherId BigInt? @map("voucher_id")
+  lineType String? @map("line_type")
+  description String?
+  amount Decimal? @db.Decimal(14, 3)
+  referenceId BigInt? @map("reference_id")
+  referenceType String? @map("reference_type")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_vendor_voucher_items")
+}
+
+
+// ═══════════════════ MODULE: IAM ═══════════════════
+
+model Departments {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  parentDepartmentId Int? @map("parent_department_id")
+  departmentCode String? @map("department_code")
+  name String?
+  hodUserId Int? @map("hod_user_id")
+  description String?
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_departments")
+}
+
+model LoginAttempts {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  userId Int? @map("user_id")
+  loginIdentifier String? @map("login_identifier")
+  attemptedAt DateTime? @map("attempted_at")
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+  deviceInfo String? @map("device_info")
+  loginStatus String? @map("login_status")
+  failedReason String? @map("failed_reason")
+  locationCity String? @map("location_city")
+  locationCountry String? @map("location_country")
+  sessionId BigInt? @map("session_id")
+  isSuspicious Boolean? @map("is_suspicious")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_login_attempts")
+}
+
+model Privileges {
+  id Int @id @default(autoincrement())
+  name String?
+  description String?
+  moduleName String? @map("module_name")
+  actionName String? @map("action_name")
+  apiEndpoint String? @map("api_endpoint")
+  parentPrivilegeId Int? @map("parent_privilege_id")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@map("masterdata_privileges")
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  name String?
+  description String?
+  roleLevel Int? @map("role_level")
+  isSystemRole Boolean? @map("is_system_role")
+  officeScope String? @map("office_scope")
+  departmentScope String? @map("department_scope")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_role")
+}
+
+model RolePrivileges {
+  id BigInt @id @default(autoincrement())
+  roleId Int? @map("role_id")
+  privilegeId Int? @map("privilege_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("masterdata_role_privileges")
+}
+
+model SecurityEvents {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  userId Int? @map("user_id")
+  eventType String? @map("event_type")
+  severity String?
+  description String?
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+  locationCity String? @map("location_city")
+  locationCountry String? @map("location_country")
+  triggeredBy Int? @map("triggered_by")
+  relatedLoginAttemptId BigInt? @map("related_login_attempt_id")
+  eventAt DateTime? @map("event_at")
+  resolvedAt DateTime? @map("resolved_at")
+  resolvedBy Int? @map("resolved_by")
+  resolutionNotes String? @map("resolution_notes")
+  metadata Json?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_security_events")
+}
+
+model UserOtps {
+  id BigInt @id @default(autoincrement())
+  userId Int? @map("user_id")
+  tenantId Int? @map("tenant_id")
+  loginId String? @map("login_id")
+  otpHash String? @map("otp_hash")
+  expiresAt DateTime? @map("expires_at")
+  failedOtpLoginAttempts Int? @map("failed_otp_login_attempts")
+  otpLoginBlockedTill DateTime? @map("otp_login_blocked_till")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_user_otps")
+}
+
+model UserSessions {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  userId Int? @map("user_id")
+  sessionTokenHash String? @map("session_token_hash")
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+  deviceType String? @map("device_type")
+  deviceInfo String? @map("device_info")
+  locationCity String? @map("location_city")
+  locationCountry String? @map("location_country")
+  locationLat Decimal? @map("location_lat") @db.Decimal(14, 3)
+  locationLng Decimal? @map("location_lng") @db.Decimal(14, 3)
+  sessionStartedAt DateTime? @map("session_started_at")
+  lastActiveAt DateTime? @map("last_active_at")
+  sessionEndedAt DateTime? @map("session_ended_at")
+  endReason String? @map("end_reason")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_user_sessions")
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  roleId Int? @map("role_id")
+  uuid String
+  employeeCode String? @map("employee_code")
+  name String?
+  loginId String? @map("login_id")
+  userType String? @map("user_type")
+  profilePicUrl String? @map("profile_pic_url")
+  jobTitle String? @map("job_title")
+  designation String?
+  department String?
+  departmentId Int? @map("department_id")
+  mobile String?
+  email String?
+  email2 String?
+  passwordHash String? @map("password_hash")
+  googleId String? @map("google_id")
+  ssoId String? @map("sso_id")
+  ssoRef String? @map("sso_ref")
+  aadhaar String?
+  pan String?
+  epfUan String? @map("epf_uan")
+  epfNum String? @map("epf_num")
+  esic String?
+  officeId Int? @map("office_id")
+  managerUserId Int? @map("manager_user_id")
+  lastLogin DateTime? @map("last_login")
+  lastPasswordReset DateTime? @map("last_password_reset")
+  failedLoginAttempts Int? @map("failed_login_attempts")
+  active Boolean?
+  status String?
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_users")
+}
+
+
+// ═══════════════════ MODULE: INTEGRATIONS ═══════════════════
+
+model ApiIntegrationLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  integrationId Int? @map("integration_id")
+  direction String?
+  method String?
+  requestUrl String? @map("request_url")
+  requestHeaders Json? @map("request_headers")
+  requestPayload String? @map("request_payload")
+  responsePayload String? @map("response_payload")
+  statusCode Int? @map("status_code")
+  durationMs Int? @map("duration_ms")
+  errorMessage String? @map("error_message")
+  errorCode String? @map("error_code")
+  retryCount Int? @map("retry_count")
+  isSuccess Boolean? @map("is_success")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  calledAt DateTime? @map("called_at")
+  respondedAt DateTime? @map("responded_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_api_integration_logs")
+}
+
+model ApiIntegrations {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  name String?
+  baseUrl String? @map("base_url")
+  apiKey String? @map("api_key")
+  authType String? @map("auth_type")
+  oauthToken String? @map("oauth_token")
+  rateLimitPerMin Int? @map("rate_limit_per_min")
+  retryPolicy Int? @map("retry_policy")
+  timeoutSeconds Int? @map("timeout_seconds")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_api_integrations")
+}
+
+model ApiProviderConfig {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  providerType String? @map("provider_type")
+  providerName String? @map("provider_name")
+  providerCode String? @map("provider_code")
+  baseUrl String? @map("base_url")
+  apiKey String? @map("api_key")
+  apiSecret String? @map("api_secret")
+  username String?
+  password String?
+  authType String? @map("auth_type")
+  tokenEndpoint String? @map("token_endpoint")
+  webhookSecret String? @map("webhook_secret")
+  timeoutSeconds Int? @map("timeout_seconds")
+  retryMax Int? @map("retry_max")
+  extraConfig Json? @map("extra_config")
+  environment String?
+  isActive Boolean? @map("is_active")
+  lastTestedAt DateTime? @map("last_tested_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_api_provider_config")
+}
+
+model ApiSyncJobs {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  integrationId Int? @map("integration_id")
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  syncType String? @map("sync_type")
+  syncStatus String? @map("sync_status")
+  priority String?
+  scheduledAt DateTime? @map("scheduled_at")
+  startedAt DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  requestPayload Json? @map("request_payload")
+  responsePayload Json? @map("response_payload")
+  httpStatusCode Int? @map("http_status_code")
+  errorMessage String? @map("error_message")
+  retryCount Int? @map("retry_count")
+  maxRetry Int? @map("max_retry")
+  nextRetryAt DateTime? @map("next_retry_at")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy Int? @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_api_sync_jobs")
+}
+
+model ApiWebhookLogs {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  apiName String? @map("api_name")
+  direction String?
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  httpMethod String? @map("http_method")
+  endpointUrl String? @map("endpoint_url")
+  requestPayload Json? @map("request_payload")
+  responsePayload Json? @map("response_payload")
+  statusCode Int? @map("status_code")
+  callStatus String? @map("call_status")
+  errorMessage String? @map("error_message")
+  retryCount Int? @map("retry_count")
+  maxRetry Int? @map("max_retry")
+  nextRetryAt DateTime? @map("next_retry_at")
+  durationMs Int? @map("duration_ms")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@index([tenantId])
+  @@map("tms_txn_api_webhook_logs")
+}
+
+model WebhookConfigs {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  name String?
+  description String?
+  url String?
+  method String?
+  authType String? @map("auth_type")
+  authConfig Json? @map("auth_config")
+  customHeaders Json? @map("custom_headers")
+  events Json?
+  payloadFormat Json? @map("payload_format")
+  payloadTemplate String? @map("payload_template")
+  timeoutSeconds Int? @map("timeout_seconds")
+  maxRetries Int? @map("max_retries")
+  retryDelaySeconds Int? @map("retry_delay_seconds")
+  signingSecret String? @map("signing_secret")
+  isActive Boolean? @map("is_active")
+  lastTriggeredAt DateTime? @map("last_triggered_at")
+  lastStatus String? @map("last_status")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_webhook_configs")
+}
+
+model WebhookLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  webhookConfigId Int? @map("webhook_config_id")
+  eventCode String? @map("event_code")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  attemptNumber Int? @map("attempt_number")
+  parentLogId BigInt? @map("parent_log_id")
+  url String?
+  method String?
+  requestHeaders Json? @map("request_headers")
+  requestPayload String? @map("request_payload")
+  responseStatus Int? @map("response_status")
+  responseBody String? @map("response_body")
+  durationMs Int? @map("duration_ms")
+  isSuccess Boolean? @map("is_success")
+  errorMessage String? @map("error_message")
+  triggeredAt DateTime? @map("triggered_at")
+  nextRetryAt DateTime? @map("next_retry_at")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([tenantId])
+  @@map("masterdata_webhook_logs")
+}
+
+
+// ═══════════════════ MODULE: MASTERS ═══════════════════
+
+model ChannelPartner {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  officeId Int? @map("office_id")
+  parentCpId Int? @map("parent_cp_id")
+  cpCode String? @map("cp_code")
+  name String?
+  contactPerson String? @map("contact_person")
+  mobile String?
+  email String?
+  cpType String? @map("cp_type")
+  gstNumber String? @map("gst_number")
+  panNumber String? @map("pan_number")
+  agreementNumber String? @map("agreement_number")
+  agreementStartDate DateTime? @map("agreement_start_date")
+  agreementEndDate DateTime? @map("agreement_end_date")
+  autoRenewal Boolean? @map("auto_renewal")
+  commissionType String? @map("commission_type")
+  commissionValue Decimal? @map("commission_value") @db.Decimal(14, 3)
+  paymentCycle String? @map("payment_cycle")
+  creditLimit Decimal? @map("credit_limit") @db.Decimal(14, 3)
+  creditDays Int? @map("credit_days")
+  rating Decimal? @db.Decimal(14, 3)
+  assignedUserId Int? @map("assigned_user_id")
+  status String?
+  onboardingStatus String? @map("onboarding_status")
+  blacklistReason String? @map("blacklist_reason")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_channel_partner")
+}
+
+model Company {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  parentCompanyId Int? @map("parent_company_id")
+  code String?
+  name String?
+  nameReg String? @map("name_reg")
+  phone1 String?
+  phone2 String?
+  email1 String?
+  email2 String?
+  website String?
+  address String?
+  addressReg String? @map("address_reg")
+  gstNum String? @map("gst_num")
+  cinNum String? @map("cin_num")
+  panNum String? @map("pan_num")
+  tanNum String? @map("tan_num")
+  msmeNum String? @map("msme_num")
+  logoUrl String? @map("logo_url")
+  organizationId Int? @map("organization_id")
+  legalEntityType String? @map("legal_entity_type")
+  registrationNumber String? @map("registration_number")
+  active Boolean?
+  seqNum Int? @map("seq_num")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_company")
+}
+
+model CpKyc {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  cpId Int? @map("cp_id")
+  legalName String? @map("legal_name")
+  dateOfReg DateTime? @map("date_of_reg")
+  owner1Name String? @map("owner1_name")
+  photo1Url String? @map("photo1_url")
+  owner1Aadhaar String? @map("owner1_aadhaar")
+  owner1AadhaarUrl String? @map("owner1_aadhaar_url")
+  owner1Pan String? @map("owner1_pan")
+  owner1PanUrl String? @map("owner1_pan_url")
+  owner1Email String? @map("owner1_email")
+  owner1Mobile String? @map("owner1_mobile")
+  owner2Name String? @map("owner2_name")
+  photo2Url String? @map("photo2_url")
+  owner2Aadhaar String? @map("owner2_aadhaar")
+  owner2AadhaarUrl String? @map("owner2_aadhaar_url")
+  owner2Pan String? @map("owner2_pan")
+  owner2PanUrl String? @map("owner2_pan_url")
+  owner2Email String? @map("owner2_email")
+  owner2Mobile String? @map("owner2_mobile")
+  country String?
+  state String?
+  district String?
+  taluka String?
+  city String?
+  pincode String?
+  address String?
+  addressReg String? @map("address_reg")
+  addrDocUrl String? @map("addr_doc_url")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  gstNum String? @map("gst_num")
+  gstCertUrl String? @map("gst_cert_url")
+  cinNum String? @map("cin_num")
+  companyRegCertUrl String? @map("company_reg_cert_url")
+  panNum String? @map("pan_num")
+  panCardUrl String? @map("pan_card_url")
+  tanNum String? @map("tan_num")
+  tanCardUrl String? @map("tan_card_url")
+  msmeNum String? @map("msme_num")
+  msmeRegCertUrl String? @map("msme_reg_cert_url")
+  aadhaarNum String? @map("aadhaar_num")
+  aadhaarCardUrl String? @map("aadhaar_card_url")
+  bank1Name String? @map("bank1_name")
+  bank1AccntHolder String? @map("bank1_accnt_holder")
+  bank1AccountType String? @map("bank1_account_type")
+  bank1AccountNum String? @map("bank1_account_num")
+  bank1IfscCode String? @map("bank1_ifsc_code")
+  bank1DocUrl String? @map("bank1_doc_url")
+  bank2Name String? @map("bank2_name")
+  bank2AccntHolder String? @map("bank2_accnt_holder")
+  bank2AccountType String? @map("bank2_account_type")
+  bank2AccountNum String? @map("bank2_account_num")
+  bank2IfscCode String? @map("bank2_ifsc_code")
+  bank2DocUrl String? @map("bank2_doc_url")
+  doc1Name String? @map("doc1_name")
+  doc1Url String? @map("doc1_url")
+  doc1Date DateTime? @map("doc1_date")
+  doc2Name String? @map("doc2_name")
+  doc2Url String? @map("doc2_url")
+  doc2Date DateTime? @map("doc2_date")
+  doc3Name String? @map("doc3_name")
+  doc3Url String? @map("doc3_url")
+  doc3Date DateTime? @map("doc3_date")
+  doc4Name String? @map("doc4_name")
+  doc4Url String? @map("doc4_url")
+  doc4Date DateTime? @map("doc4_date")
+  kycCompleted Boolean? @map("kyc_completed")
+  active Boolean?
+  status String?
+  note String?
+  verificationStatus String? @map("verification_status")
+  verifiedBy Int? @map("verified_by")
+  verifiedAt DateTime? @map("verified_at")
+  expiryDate DateTime? @map("expiry_date")
+  rejectionReason String? @map("rejection_reason")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_cp_kyc")
+}
+
+model CustContract {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  customerId Int? @map("customer_id")
+  customerGroupId Int? @map("customer_group_id")
+  ctrNum String? @map("ctr_num")
+  startDate DateTime? @map("start_date")
+  endDate DateTime? @map("end_date")
+  paymentType Json? @map("payment_type")
+  loadType Json? @map("load_type")
+  distanceType Json? @map("distance_type")
+  rateType Json? @map("rate_type")
+  pickupDeliveryMode Json? @map("pickup_delivery_mode")
+  excessWtChargeable Boolean? @map("excess_wt_chargeable")
+  odaDelChargeable Boolean? @map("oda_del_chargeable")
+  creditPeriod Int? @map("credit_period")
+  docuChargesPerInvoice String? @map("docu_charges_per_invoice")
+  loadingChargesPerPkg String? @map("loading_charges_per_pkg")
+  fuelSurcharge String? @map("fuel_surcharge")
+  odaMinDelCharges String? @map("oda_min_del_charges")
+  reversePickUpCharges String? @map("reverse_pick_up_charges")
+  insuranceCharges String? @map("insurance_charges")
+  minimumChargeableWt String? @map("minimum_chargeable_wt")
+  active Boolean?
+  versionNo Int? @map("version_no")
+  isCurrent Boolean? @map("is_current")
+  supersededBy BigInt? @map("superseded_by")
+  approvalStatus String? @map("approval_status")
+  rejectionReason String? @map("rejection_reason")
+  effectiveFrom DateTime? @map("effective_from")
+  effectiveUntil DateTime? @map("effective_until")
+  changeSummary String? @map("change_summary")
+  previousVersionId BigInt? @map("previous_version_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_cust_contract")
+}
+
+model CustContractExcessWeight {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  custContractId BigInt? @map("cust_contract_id")
+  ctrNum String? @map("ctr_num")
+  lowerLimit String? @map("lower_limit")
+  upperLimit String? @map("upper_limit")
+  rate String?
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_cust_contract_excess_weight")
+}
+
+model CustContractOdaCharges {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  custContractId BigInt? @map("cust_contract_id")
+  ctrNum String? @map("ctr_num")
+  fromPlaceId BigInt? @map("from_place_id")
+  fromPlace String? @map("from_place")
+  toPlaceId BigInt? @map("to_place_id")
+  toPlace String? @map("to_place")
+  rate String?
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_cust_contract_oda_charges")
+}
+
+model CustContractSlabDefinition {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  custContractId BigInt? @map("cust_contract_id")
+  ctrNum String? @map("ctr_num")
+  slabDistanceType Json? @map("slab_distance_type")
+  slabContractType String? @map("slab_contract_type")
+  slabRateType String? @map("slab_rate_type")
+  slabNumber String? @map("slab_number")
+  slabLowerLimit Int? @map("slab_lower_limit")
+  slabUpperLimit Int? @map("slab_upper_limit")
+  versionNo Int? @map("version_no")
+  isCurrent Boolean? @map("is_current")
+  supersededBy BigInt? @map("superseded_by")
+  approvalStatus String? @map("approval_status")
+  approvedBy Int? @map("approved_by")
+  rejectionReason String? @map("rejection_reason")
+  effectiveFrom DateTime? @map("effective_from")
+  effectiveUntil DateTime? @map("effective_until")
+  changeSummary String? @map("change_summary")
+  previousVersionId BigInt? @map("previous_version_id")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_cust_contract_slab_definition")
+}
+
+model CustContractSlabRates {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  custContractId BigInt? @map("cust_contract_id")
+  ctrNum String? @map("ctr_num")
+  zone String?
+  fromPlaceId BigInt? @map("from_place_id")
+  fromPlace String? @map("from_place")
+  toPlaceId BigInt? @map("to_place_id")
+  toPlace String? @map("to_place")
+  tat Int?
+  slabDistanceType Json? @map("slab_distance_type")
+  slabContractType String? @map("slab_contract_type")
+  slab1 String?
+  slab2 String?
+  slab3 String?
+  slab4 String?
+  slab5 String?
+  slab6 String?
+  slab7 String?
+  slab8 String?
+  versionNo Int? @map("version_no")
+  isCurrent Boolean? @map("is_current")
+  supersededBy BigInt? @map("superseded_by")
+  approvalStatus String? @map("approval_status")
+  approvedBy Int? @map("approved_by")
+  rejectionReason String? @map("rejection_reason")
+  effectiveFrom DateTime? @map("effective_from")
+  effectiveUntil DateTime? @map("effective_until")
+  changeSummary String? @map("change_summary")
+  previousVersionId BigInt? @map("previous_version_id")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_cust_contract_slab_rates")
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  parentId Int? @map("parent_id")
+  primaryServicingOfficeId Int? @map("primary_servicing_office_id")
+  code String?
+  name String?
+  nameReg String? @map("name_reg")
+  cType String? @map("c_type")
+  cSubtype String? @map("c_subtype")
+  customerType String? @map("customer_type")
+  customerGroup String? @map("customer_group")
+  industryType String? @map("industry_type")
+  paymentTypes Json? @map("payment_types")
+  mobile String?
+  telNum String? @map("tel_num")
+  email String?
+  billingContactPerson String? @map("billing_contact_person")
+  billingMobile String? @map("billing_mobile")
+  billingEmail String? @map("billing_email")
+  billingAddress String? @map("billing_address")
+  billingAddressReg String? @map("billing_address_reg")
+  country String?
+  state String?
+  district String?
+  taluka String?
+  city String?
+  pincode String?
+  address String?
+  addressReg String? @map("address_reg")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  panNum String? @map("pan_num")
+  gstNum String? @map("gst_num")
+  creditLimit Decimal? @map("credit_limit") @db.Decimal(14, 3)
+  paymentTerms String? @map("payment_terms")
+  billingCycle String? @map("billing_cycle")
+  accountManagerId Int? @map("account_manager_id")
+  otherServicingOffices Json? @map("other_servicing_offices")
+  erpEntryDate DateTime? @map("erp_entry_date")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_customer")
+}
+
+model Driver {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  vendorId Int? @map("vendor_id")
+  homeOfficeId Int? @map("home_office_id")
+  name String?
+  mobile String?
+  dlNumber String? @map("dl_number")
+  dlCategory String? @map("dl_category")
+  dlExpiryDate DateTime? @map("dl_expiry_date")
+  emergencyContactName String? @map("emergency_contact_name")
+  emergencyContactMobile String? @map("emergency_contact_mobile")
+  bloodGroup String? @map("blood_group")
+  medicalFitnessExpiry DateTime? @map("medical_fitness_expiry")
+  driverStatus String? @map("driver_status")
+  driverRating Decimal? @map("driver_rating") @db.Decimal(14, 3)
+  totalTrips Int? @map("total_trips")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_driver")
+}
+
+model DriverRate {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  contractingOfficeId Int? @map("contracting_office_id")
+  vendorId Int? @map("vendor_id")
+  vendorName String? @map("vendor_name")
+  defaultRateType String? @map("default_rate_type")
+  dailyRate String? @map("daily_rate")
+  hourlyRate String? @map("hourly_rate")
+  overtimeHourlyRate String? @map("overtime_hourly_rate")
+  dailyAllowance String? @map("daily_allowance")
+  perKmRate String? @map("per_km_rate")
+  perExtraKmRate String? @map("per_extra_km_rate")
+  nightHaltRate String? @map("night_halt_rate")
+  perTripRate String? @map("per_trip_rate")
+  tripAllowance String? @map("trip_allowance")
+  incentivePerTrip String? @map("incentive_per_trip")
+  monthlySal String? @map("monthly_sal")
+  monthlyIncentive String? @map("monthly_incentive")
+  perTripPenaltyPercent String? @map("per_trip_penalty_percent")
+  perTripPenaltyFixedAmount String? @map("per_trip_penalty_fixed_amount")
+  startDate DateTime? @map("start_date")
+  endDate DateTime? @map("end_date")
+  active Boolean?
+  status String?
+  note String?
+  versionNo Int? @map("version_no")
+  isCurrent Boolean? @map("is_current")
+  supersededBy BigInt? @map("superseded_by")
+  approvalStatus String? @map("approval_status")
+  approvedBy Int? @map("approved_by")
+  rejectionReason String? @map("rejection_reason")
+  effectiveFrom DateTime? @map("effective_from")
+  effectiveUntil DateTime? @map("effective_until")
+  changeSummary String? @map("change_summary")
+  previousVersionId BigInt? @map("previous_version_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_driver_rate")
+}
+
+model GeoHierarchy {
+  id Int @id @default(autoincrement())
+  country String?
+  state String?
+  district String?
+  city String?
+  zone String?
+  taluka String?
+  poName String? @map("po_name")
+  pincode String?
+  poLat Decimal? @map("po_lat") @db.Decimal(14, 3)
+  poLong Decimal? @map("po_long") @db.Decimal(14, 3)
+  place String?
+  placeLat Decimal? @map("place_lat") @db.Decimal(14, 3)
+  placeLong Decimal? @map("place_long") @db.Decimal(14, 3)
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@map("masterdata_geo_hierarchy")
+}
+
+model LoaderRate {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  contractingOfficeId Int? @map("contracting_office_id")
+  vendorId Int? @map("vendor_id")
+  vendorName String? @map("vendor_name")
+  defaultRateType String? @map("default_rate_type")
+  regPkgRate String? @map("reg_pkg_rate")
+  crossingPkgRate String? @map("crossing_pkg_rate")
+  regWeightRate String? @map("reg_weight_rate")
+  crossingWeightRate String? @map("crossing_weight_rate")
+  monthlySal String? @map("monthly_sal")
+  dailyAllowance String? @map("daily_allowance")
+  dailyWage String? @map("daily_wage")
+  dailyWagePkgCapping Int? @map("daily_wage_pkg_capping")
+  dailyWageWeightCapping Int? @map("daily_wage_weight_capping")
+  overtimeHourlyRate String? @map("overtime_hourly_rate")
+  startDate DateTime? @map("start_date")
+  endDate DateTime? @map("end_date")
+  active Boolean?
+  status String?
+  note String?
+  versionNo Int? @map("version_no")
+  isCurrent Boolean? @map("is_current")
+  supersededBy BigInt? @map("superseded_by")
+  approvalStatus String? @map("approval_status")
+  approvedBy Int? @map("approved_by")
+  rejectionReason String? @map("rejection_reason")
+  effectiveFrom DateTime? @map("effective_from")
+  effectiveUntil DateTime? @map("effective_until")
+  changeSummary String? @map("change_summary")
+  previousVersionId BigInt? @map("previous_version_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_loader_rate")
+}
+
+model Office {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  parentOfficeId Int? @map("parent_office_id")
+  code String?
+  name String?
+  nameReg String? @map("name_reg")
+  oType String? @map("o_type")
+  officeLevel Int? @map("office_level")
+  gstNum String? @map("gst_num")
+  cinNum String? @map("cin_num")
+  owned Boolean?
+  cpKycId Int? @map("cp_kyc_id")
+  country String?
+  state String?
+  district String?
+  taluka String?
+  city String?
+  pincode String?
+  address String?
+  addressReg String? @map("address_reg")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  geoZoneId Int? @map("geo_zone_id")
+  capacityPackages Int? @map("capacity_packages")
+  active Boolean?
+  description String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_office")
+}
+
+model StationCoverage {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  servicingOfficeId Int? @map("servicing_office_id")
+  name String?
+  nameReg String? @map("name_reg")
+  postName String? @map("post_name")
+  postNameReg String? @map("post_name_reg")
+  pincode String?
+  taluka String?
+  talukaReg String? @map("taluka_reg")
+  district String?
+  districtReg String? @map("district_reg")
+  state String?
+  stateReg String? @map("state_reg")
+  country String?
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  nameGmap String? @map("name_gmap")
+  serviceOfficeTat Int? @map("service_office_tat")
+  servicingOfficeDist Int? @map("servicing_office_dist")
+  zone String?
+  routeNum String? @map("route_num")
+  routeSequence Int? @map("route_sequence")
+  oda Boolean?
+  nrStateHighway String? @map("nr_state_highway")
+  nrNationalHighway String? @map("nr_national_highway")
+  active Boolean?
+  status String?
+  note String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_station_coverage")
+}
+
+model Vehicles {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  baseOfficeId Int? @map("base_office_id")
+  vendorId Int? @map("vendor_id")
+  rcNum String? @map("rc_num")
+  vehicleNum String? @map("vehicle_num")
+  vehicleOwnership String? @map("vehicle_ownership")
+  ownerType String? @map("owner_type")
+  bodyType String? @map("body_type")
+  make String?
+  model String?
+  specification String?
+  subSpecification String? @map("sub_specification")
+  fuelType String? @map("fuel_type")
+  gvw String?
+  capacity String?
+  gvwCapacityUnit String? @map("gvw_capacity_unit")
+  length String?
+  width String?
+  height String?
+  lwhUnit String? @map("lwh_unit")
+  vehicleContactMobile1 String? @map("vehicle_contact_mobile1")
+  vehicleContactMobile2 String? @map("vehicle_contact_mobile2")
+  rtoRegExpiry DateTime? @map("rto_reg_expiry")
+  rcUrl String? @map("rc_url")
+  insurancePolicyNum String? @map("insurance_policy_num")
+  insuranceExpiry DateTime? @map("insurance_expiry")
+  insuranceDocUrl String? @map("insurance_doc_url")
+  fitnessCertNum String? @map("fitness_cert_num")
+  fitnessCertExpiry DateTime? @map("fitness_cert_expiry")
+  fitnessCertUrl String? @map("fitness_cert_url")
+  permitExpiry DateTime? @map("permit_expiry")
+  pollutionExpiry DateTime? @map("pollution_expiry")
+  gpsDeviceId String? @map("gps_device_id")
+  manufacturingYear String? @map("manufacturing_year")
+  vehicleStatus Int? @map("vehicle_status")
+  currentOfficeId Int? @map("current_office_id")
+  active Boolean?
+  status String?
+  note String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_vehicles")
+}
+
+model Vendor {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyTag Int? @map("company_tag")
+  contractingOfficeId Int? @map("contracting_office_id")
+  code String?
+  name String?
+  nameReg String? @map("name_reg")
+  legalName String? @map("legal_name")
+  legalNameReg String? @map("legal_name_reg")
+  erpCode String? @map("erp_code")
+  vType String? @map("v_type")
+  vendorCategory Int? @map("vendor_category")
+  mobile String?
+  email String?
+  vendorRating Decimal? @map("vendor_rating") @db.Decimal(14, 3)
+  paymentTerms String? @map("payment_terms")
+  contractId Int? @map("contract_id")
+  active Boolean?
+  blacklistedFlag Boolean? @map("blacklisted_flag")
+  blacklistReason String? @map("blacklist_reason")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_vendor")
+}
+
+model VendorKyc {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  vendorId Int? @map("vendor_id")
+  vType String? @map("v_type")
+  legalName String? @map("legal_name")
+  owner1Name String? @map("owner1_name")
+  photo1Url String? @map("photo1_url")
+  owner1Aadhaar String? @map("owner1_aadhaar")
+  owner1AadhaarUrl String? @map("owner1_aadhaar_url")
+  owner1Pan String? @map("owner1_pan")
+  owner1PanUrl String? @map("owner1_pan_url")
+  owner1Email String? @map("owner1_email")
+  owner1Mobile String? @map("owner1_mobile")
+  owner2Name String? @map("owner2_name")
+  photo2Url String? @map("photo2_url")
+  owner2Aadhaar String? @map("owner2_aadhaar")
+  owner2AadhaarUrl String? @map("owner2_aadhaar_url")
+  owner2Pan String? @map("owner2_pan")
+  owner2PanUrl String? @map("owner2_pan_url")
+  owner2Email String? @map("owner2_email")
+  owner2Mobile String? @map("owner2_mobile")
+  dlNum String? @map("dl_num")
+  dlIssueDate DateTime? @map("dl_issue_date")
+  dlExpiryDate DateTime? @map("dl_expiry_date")
+  dlIssueRto String? @map("dl_issue_rto")
+  dlCardUrl String? @map("dl_card_url")
+  country String?
+  state String?
+  district String?
+  taluka String?
+  city String?
+  pincode String?
+  address String?
+  addressReg String? @map("address_reg")
+  addrDocUrl String? @map("addr_doc_url")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  gstNum String? @map("gst_num")
+  gstCertUrl String? @map("gst_cert_url")
+  cinNum String? @map("cin_num")
+  companyRegCertUrl String? @map("company_reg_cert_url")
+  panNum String? @map("pan_num")
+  panCardUrl String? @map("pan_card_url")
+  tanNum String? @map("tan_num")
+  tanCardUrl String? @map("tan_card_url")
+  msmeNum String? @map("msme_num")
+  msmeRegCertUrl String? @map("msme_reg_cert_url")
+  aadhaarNum String? @map("aadhaar_num")
+  aadhaarCardUrl String? @map("aadhaar_card_url")
+  bank1Name String? @map("bank1_name")
+  bank1AccntHolder String? @map("bank1_accnt_holder")
+  bank1AccountType String? @map("bank1_account_type")
+  bank1AccountNum String? @map("bank1_account_num")
+  bank1IfscCode String? @map("bank1_ifsc_code")
+  bank1DocUrl String? @map("bank1_doc_url")
+  bank2Name String? @map("bank2_name")
+  bank2AccntHolder String? @map("bank2_accnt_holder")
+  bank2AccountType String? @map("bank2_account_type")
+  bank2AccountNum String? @map("bank2_account_num")
+  bank2IfscCode String? @map("bank2_ifsc_code")
+  bank2DocUrl String? @map("bank2_doc_url")
+  doc1Name String? @map("doc1_name")
+  doc1Url String? @map("doc1_url")
+  doc1Date DateTime? @map("doc1_date")
+  doc2Name String? @map("doc2_name")
+  doc2Url String? @map("doc2_url")
+  doc2Date DateTime? @map("doc2_date")
+  doc3Name String? @map("doc3_name")
+  doc3Url String? @map("doc3_url")
+  doc3Date DateTime? @map("doc3_date")
+  doc4Name String? @map("doc4_name")
+  doc4Url String? @map("doc4_url")
+  doc4Date DateTime? @map("doc4_date")
+  keyPersonnel1Name String? @map("key_personnel1_name")
+  keyPersonnel1JobTitle String? @map("key_personnel1_job_title")
+  keyPersonnel1Mobile String? @map("key_personnel1_mobile")
+  keyPersonnel1Email String? @map("key_personnel1_email")
+  keyPersonnel2Name String? @map("key_personnel2_name")
+  keyPersonnel2JobTitle String? @map("key_personnel2_job_title")
+  keyPersonnel2Mobile String? @map("key_personnel2_mobile")
+  keyPersonnel2Email String? @map("key_personnel2_email")
+  dateOfReg DateTime? @map("date_of_reg")
+  verificationStatus String? @map("verification_status")
+  verifiedBy Int? @map("verified_by")
+  verifiedAt DateTime? @map("verified_at")
+  expiryDate DateTime? @map("expiry_date")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_vendor_kyc")
+}
+
+model WorkflowMaster {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  name String?
+  module String?
+  approvalType String? @map("approval_type")
+  escalationHours Int? @map("escalation_hours")
+  autoApprovalHours Int? @map("auto_approval_hours")
+  escalationUserId Int? @map("escalation_user_id")
+  description String?
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_workflow_master")
+}
+
+
+// ═══════════════════ MODULE: NOTIFICATIONS ═══════════════════
+
+model NotificationLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  templateId Int? @map("template_id")
+  eventCode String? @map("event_code")
+  channel String?
+  recipientType String? @map("recipient_type")
+  recipientId Int? @map("recipient_id")
+  recipientMobile String? @map("recipient_mobile")
+  recipientEmail String? @map("recipient_email")
+  subject String?
+  bodySent String? @map("body_sent")
+  provider String?
+  providerMessageId String? @map("provider_message_id")
+  sentAt DateTime? @map("sent_at")
+  deliveryStatus String? @map("delivery_status")
+  deliveredAt DateTime? @map("delivered_at")
+  failedReason String? @map("failed_reason")
+  retryCount Int? @map("retry_count")
+  costUnits Decimal? @map("cost_units") @db.Decimal(14, 3)
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  triggeredBy Int? @map("triggered_by")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([tenantId])
+  @@map("masterdata_notification_logs")
+}
+
+model NotificationTemplates {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  eventCode String? @map("event_code")
+  eventName String? @map("event_name")
+  channel String?
+  languageCode String? @map("language_code")
+  subject String?
+  body String?
+  bodyHtml String? @map("body_html")
+  variables Json?
+  senderId String? @map("sender_id")
+  dltTemplateId String? @map("dlt_template_id")
+  provider Int?
+  category String?
+  isActive Boolean? @map("is_active")
+  version Int?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_notification_templates")
+}
+
+model NotificationQueue {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  eventCode String? @map("event_code")
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  channel String?
+  templateId Int? @map("template_id")
+  recipientMobile String? @map("recipient_mobile")
+  recipientEmail String? @map("recipient_email")
+  message String?
+  variablesJson Json? @map("variables_json")
+  status String?
+  provider String?
+  providerMsgId String? @map("provider_msg_id")
+  retryCount Int? @map("retry_count")
+  scheduledAt DateTime? @map("scheduled_at")
+  sentAt DateTime? @map("sent_at")
+  errorMessage String? @map("error_message")
+  createdAt DateTime @default(now()) @map("created_at")
+  maxRetry Int? @map("max_retry")
+  nextRetryAt DateTime? @map("next_retry_at")
+  webhookRequired Boolean? @map("webhook_required")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  @@index([tenantId, status])
+  @@map("tms_txn_notification_queue")
+}
+
+
+// ═══════════════════ MODULE: OPERATIONS ═══════════════════
+
+model Booking {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  bookingNo String? @map("booking_no")
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  bookingOfficeId Int? @map("booking_office_id")
+  customerId Int? @map("customer_id")
+  consignorId Int? @map("consignor_id")
+  consigneeId Int? @map("consignee_id")
+  billingPartyId Int? @map("billing_party_id")
+  contractId Int? @map("contract_id")
+  pickupAddressId Int? @map("pickup_address_id")
+  deliveryAddressId Int? @map("delivery_address_id")
+  originHubId Int? @map("origin_hub_id")
+  destinationHubId Int? @map("destination_hub_id")
+  originPincode String? @map("origin_pincode")
+  destinationPincode String? @map("destination_pincode")
+  isOda Boolean? @map("is_oda")
+  paymentType String? @map("payment_type")
+  pickupType String? @map("pickup_type")
+  deliveryType String? @map("delivery_type")
+  loadType String? @map("load_type")
+  deliverySpeed String? @map("delivery_speed")
+  priority String?
+  bookingDate DateTime? @map("booking_date")
+  expectedPickupAt DateTime? @map("expected_pickup_at")
+  expectedDeliveryAt DateTime? @map("expected_delivery_at")
+  specialInstructions String? @map("special_instructions")
+  bookingStatus String? @map("booking_status")
+  cancelReasonId Int? @map("cancel_reason_id")
+  cancelNotes String? @map("cancel_notes")
+  refNum String? @map("ref_num")
+  ewaybillRequired Boolean? @map("ewaybill_required")
+  bookingFlowType String? @map("booking_flow_type")
+  bookingSource String? @map("booking_source")
+  isDirectLr Boolean? @map("is_direct_lr")
+  actualPickupAt DateTime? @map("actual_pickup_at")
+  verifiedBy Int? @map("verified_by")
+  actualWeightVerifiedAt DateTime? @map("actual_weight_verified_at")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  updatedBy Int? @map("updated_by")
+  @@index([tenantId])
+  @@map("tms_txn_booking")
+}
+
+model BookingCharges {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  bookingId BigInt? @map("booking_id")
+  lrId BigInt? @map("lr_id")
+  contractId Int? @map("contract_id")
+  rateType String? @map("rate_type")
+  freightRatePerKg Decimal? @map("freight_rate_per_kg") @db.Decimal(14, 3)
+  freightRatePerPkg Decimal? @map("freight_rate_per_pkg") @db.Decimal(14, 3)
+  chargeableWeight Decimal? @map("chargeable_weight") @db.Decimal(14, 3)
+  freightCharges Decimal? @map("freight_charges") @db.Decimal(14, 3)
+  excessWeightCharges Decimal? @map("excess_weight_charges") @db.Decimal(14, 3)
+  loadingCharges Decimal? @map("loading_charges") @db.Decimal(14, 3)
+  doorDeliveryCharges Decimal? @map("door_delivery_charges") @db.Decimal(14, 3)
+  odaCharges Decimal? @map("oda_charges") @db.Decimal(14, 3)
+  insuranceRatePct Decimal? @map("insurance_rate_pct") @db.Decimal(14, 3)
+  insuranceAmount Decimal? @map("insurance_amount") @db.Decimal(14, 3)
+  fuelSurcharge Decimal? @map("fuel_surcharge") @db.Decimal(14, 3)
+  codCharges Decimal? @map("cod_charges") @db.Decimal(14, 3)
+  otherCharges Decimal? @map("other_charges") @db.Decimal(14, 3)
+  otherChargesRemarks String? @map("other_charges_remarks")
+  subTotal Decimal? @map("sub_total") @db.Decimal(14, 3)
+  sgstRate Decimal? @map("sgst_rate") @db.Decimal(14, 3)
+  cgstRate Decimal? @map("cgst_rate") @db.Decimal(14, 3)
+  igstRate Decimal? @map("igst_rate") @db.Decimal(14, 3)
+  sgstAmount Decimal? @map("sgst_amount") @db.Decimal(14, 3)
+  cgstAmount Decimal? @map("cgst_amount") @db.Decimal(14, 3)
+  igstAmount Decimal? @map("igst_amount") @db.Decimal(14, 3)
+  totalCharges Decimal? @map("total_charges") @db.Decimal(14, 3)
+  advanceAmount Decimal? @map("advance_amount") @db.Decimal(14, 3)
+  balanceAmount Decimal? @map("balance_amount") @db.Decimal(14, 3)
+  isLocked Boolean? @map("is_locked")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_booking_charges")
+}
+
+model BookingItems {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  bookingId BigInt? @map("booking_id")
+  lrId BigInt? @map("lr_id")
+  itemSeq Int? @map("item_seq")
+  invoiceNo String? @map("invoice_no")
+  invoiceDate DateTime? @map("invoice_date")
+  invoiceValue Decimal? @map("invoice_value") @db.Decimal(14, 3)
+  goodsDesc String? @map("goods_desc")
+  hsnCode String? @map("hsn_code")
+  numPackages Int? @map("num_packages")
+  pkgType String? @map("pkg_type")
+  actualWeight Decimal? @map("actual_weight") @db.Decimal(14, 3)
+  lengthCm Decimal? @map("length_cm") @db.Decimal(14, 3)
+  widthCm Decimal? @map("width_cm") @db.Decimal(14, 3)
+  heightCm Decimal? @map("height_cm") @db.Decimal(14, 3)
+  volWeightKg Decimal? @map("vol_weight_kg") @db.Decimal(14, 3)
+  isDangerous Boolean? @map("is_dangerous")
+  barcodeNo String? @map("barcode_no")
+  pickedQty Int? @map("picked_qty")
+  verifiedQty Int? @map("verified_qty")
+  loadedQty Int? @map("loaded_qty")
+  receivedQty Int? @map("received_qty")
+  deliveredQty Int? @map("delivered_qty")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("tms_txn_booking_items")
+}
+
+model DriverTasks {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  driverId Int? @map("driver_id")
+  tripId BigInt? @map("trip_id")
+  lrId BigInt? @map("lr_id")
+  taskType DateTime? @map("task_type")
+  taskTitle String? @map("task_title")
+  taskDetails String? @map("task_details")
+  dueAt DateTime? @map("due_at")
+  status String?
+  priority String?
+  reminderCount Int? @map("reminder_count")
+  lastRemindedAt DateTime? @map("last_reminded_at")
+  completedAt DateTime? @map("completed_at")
+  completedNote String? @map("completed_note")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("tms_txn_driver_tasks")
+}
+
+model Drs {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  drsNo String? @map("drs_no")
+  tenantId Int? @map("tenant_id")
+  officeId Int? @map("office_id")
+  drsDate DateTime? @map("drs_date")
+  tripId BigInt? @map("trip_id")
+  driverId Int? @map("driver_id")
+  vehicleId Int? @map("vehicle_id")
+  vehicleNo String? @map("vehicle_no")
+  driverMobile String? @map("driver_mobile")
+  numLrs Int? @map("num_lrs")
+  totalPackages Int? @map("total_packages")
+  drsStatus String? @map("drs_status")
+  startTime DateTime? @map("start_time")
+  endTime DateTime? @map("end_time")
+  totalCodAmount Decimal? @map("total_cod_amount") @db.Decimal(14, 3)
+  codCollected Decimal? @map("cod_collected") @db.Decimal(14, 3)
+  cashSubmitted Boolean? @map("cash_submitted")
+  estimatedKm Decimal? @map("estimated_km") @db.Decimal(14, 3)
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_drs")
+}
+
+model DrsLrs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  drsId BigInt? @map("drs_id")
+  lrId BigInt? @map("lr_id")
+  tripLrId BigInt? @map("trip_lr_id")
+  seqNo Int? @map("seq_no")
+  consigneeName String? @map("consignee_name")
+  consigneeMobile String? @map("consignee_mobile")
+  deliveryAddr String? @map("delivery_addr")
+  numPackages Int? @map("num_packages")
+  topayAmount Decimal? @map("topay_amount") @db.Decimal(14, 3)
+  codAmount Decimal? @map("cod_amount") @db.Decimal(14, 3)
+  delStatus String? @map("del_status")
+  podId BigInt? @map("pod_id")
+  failReasonId Int? @map("fail_reason_id")
+  reattemptDate DateTime? @map("reattempt_date")
+  attemptNo Int? @map("attempt_no")
+  otpRequired Boolean? @map("otp_required")
+  otpVerified Boolean? @map("otp_verified")
+  receiverOtp String? @map("receiver_otp")
+  deliveryLatitude Decimal? @map("delivery_latitude") @db.Decimal(14, 3)
+  deliveryLongitude Decimal? @map("delivery_longitude") @db.Decimal(14, 3)
+  deliveryPhotoUrl String? @map("delivery_photo_url")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("tms_txn_drs_lrs")
+}
+
+model Ewaybill {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  lrId BigInt? @map("lr_id")
+  bookingId BigInt? @map("booking_id")
+  ewbNo String? @map("ewb_no")
+  ewbDate DateTime? @map("ewb_date")
+  ewbValidTill DateTime? @map("ewb_valid_till")
+  ewbType String? @map("ewb_type")
+  supplyType String? @map("supply_type")
+  gstinSupplier String? @map("gstin_supplier")
+  gstinRecipient String? @map("gstin_recipient")
+  placeOfSupply String? @map("place_of_supply")
+  totalValue Decimal? @map("total_value") @db.Decimal(14, 3)
+  hsnCode String? @map("hsn_code")
+  transporterId String? @map("transporter_id")
+  vehicleNo String? @map("vehicle_no")
+  vehicleType String? @map("vehicle_type")
+  ewbStatus String? @map("ewb_status")
+  generationMode String? @map("generation_mode")
+  cancelReason String? @map("cancel_reason")
+  apiRequestJson Json? @map("api_request_json")
+  apiResponseJson Json? @map("api_response_json")
+  consolidatedEwbNo String? @map("consolidated_ewb_no")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_ewaybill")
+}
+
+model Lr {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  lrNo String? @map("lr_no")
+  bookingId BigInt? @map("booking_id")
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  originOfficeId Int? @map("origin_office_id")
+  destinationOfficeId Int? @map("destination_office_id")
+  currentOfficeId Int? @map("current_office_id")
+  consignorId Int? @map("consignor_id")
+  consigneeId Int? @map("consignee_id")
+  consignorName String? @map("consignor_name")
+  consignorAddr String? @map("consignor_addr")
+  consignorGst String? @map("consignor_gst")
+  consigneeName String? @map("consignee_name")
+  consigneeAddr String? @map("consignee_addr")
+  consigneeGst String? @map("consignee_gst")
+  consigneeMobile String? @map("consignee_mobile")
+  totalPackages Int? @map("total_packages")
+  totalWeightKg Decimal? @map("total_weight_kg") @db.Decimal(14, 3)
+  chargeableWeight Decimal? @map("chargeable_weight") @db.Decimal(14, 3)
+  totalCharges Decimal? @map("total_charges") @db.Decimal(14, 3)
+  paymentType String? @map("payment_type")
+  lrStatus String? @map("lr_status")
+  currentStatusCode String? @map("current_status_code")
+  ewaybillNo String? @map("ewaybill_no")
+  ewaybillExpiry DateTime? @map("ewaybill_expiry")
+  podRequired Boolean? @map("pod_required")
+  podId BigInt? @map("pod_id")
+  isReturnLr Boolean? @map("is_return_lr")
+  originalLrId BigInt? @map("original_lr_id")
+  printedAt DateTime? @map("printed_at")
+  printedBy Int? @map("printed_by")
+  lrSource String? @map("lr_source")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_lr")
+}
+
+model LrStateLog {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  lrId BigInt? @map("lr_id")
+  fromStatus String? @map("from_status")
+  toStatus String? @map("to_status")
+  changedBy Int? @map("changed_by")
+  changedAt DateTime? @map("changed_at")
+  remarks String?
+  triggerEntity String? @map("trigger_entity")
+  triggerId BigInt? @map("trigger_id")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([tenantId])
+  @@map("tms_txn_lr_state_log")
+}
+
+model Manifest {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  manifestNo String? @map("manifest_no")
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  originOfficeId Int? @map("origin_office_id")
+  destinationOfficeId Int? @map("destination_office_id")
+  manifestDate DateTime? @map("manifest_date")
+  vendorId Int? @map("vendor_id")
+  vehicleId Int? @map("vehicle_id")
+  vehicleNo String? @map("vehicle_no")
+  driverId Int? @map("driver_id")
+  driverName String? @map("driver_name")
+  driverMobile String? @map("driver_mobile")
+  numLrs Int? @map("num_lrs")
+  totalPackages Int? @map("total_packages")
+  totalWeightKg Decimal? @map("total_weight_kg") @db.Decimal(14, 3)
+  tripId BigInt? @map("trip_id")
+  consolidatedEwbNo String? @map("consolidated_ewb_no")
+  estimatedKm Decimal? @map("estimated_km") @db.Decimal(14, 3)
+  freightCharges Decimal? @map("freight_charges") @db.Decimal(14, 3)
+  loadingCharges Decimal? @map("loading_charges") @db.Decimal(14, 3)
+  advancePaid Decimal? @map("advance_paid") @db.Decimal(14, 3)
+  manifestStatus String? @map("manifest_status")
+  dispatchedAt DateTime? @map("dispatched_at")
+  arrivedAt DateTime? @map("arrived_at")
+  meterStart Int? @map("meter_start")
+  meterEnd Int? @map("meter_end")
+  podReceivedBy Int? @map("pod_received_by")
+  cancelReasonId Int? @map("cancel_reason_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_manifest")
+}
+
+model ManifestLrs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  manifestId BigInt? @map("manifest_id")
+  lrId BigInt? @map("lr_id")
+  numPackages Int? @map("num_packages")
+  weightKg Decimal? @map("weight_kg") @db.Decimal(14, 3)
+  isLoaded Boolean? @map("is_loaded")
+  loadedBy Int? @map("loaded_by")
+  loadedAt DateTime? @map("loaded_at")
+  isReceived Boolean? @map("is_received")
+  receivedBy Int? @map("received_by")
+  receivedAt DateTime? @map("received_at")
+  shortagePkg Int? @map("shortage_pkg")
+  excessPkg Int? @map("excess_pkg")
+  damageFlag Boolean? @map("damage_flag")
+  loadedScanTime DateTime? @map("loaded_scan_time")
+  receivedScanTime DateTime? @map("received_scan_time")
+  exceptionStatus String? @map("exception_status")
+  exceptionRemarks String? @map("exception_remarks")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@index([tenantId])
+  @@map("tms_txn_manifest_lrs")
+}
+
+model Pod {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  lrId BigInt? @map("lr_id")
+  drsId BigInt? @map("drs_id")
+  drsLrId BigInt? @map("drs_lr_id")
+  podType String? @map("pod_type")
+  receiverName String? @map("receiver_name")
+  receiverMobile String? @map("receiver_mobile")
+  receiverRelation String? @map("receiver_relation")
+  signatureUrl String? @map("signature_url")
+  photoUrl String? @map("photo_url")
+  stampUrl String? @map("stamp_url")
+  geoLatitude Decimal? @map("geo_latitude") @db.Decimal(14, 3)
+  geoLongitude Decimal? @map("geo_longitude") @db.Decimal(14, 3)
+  deliveryTime DateTime? @map("delivery_time")
+  numPackagesDel Int? @map("num_packages_del")
+  damageStatus String? @map("damage_status")
+  shortageQty Int? @map("shortage_qty")
+  excessQty Int? @map("excess_qty")
+  remarks String?
+  topayCollected Decimal? @map("topay_collected") @db.Decimal(14, 3)
+  codCollected Decimal? @map("cod_collected") @db.Decimal(14, 3)
+  verified Boolean?
+  verifiedBy Int? @map("verified_by")
+  verifiedAt DateTime? @map("verified_at")
+  invoiceTriggered Boolean? @map("invoice_triggered")
+  otpVerified Boolean? @map("otp_verified")
+  podVerificationStatus String? @map("pod_verification_status")
+  podRejectReasonId Int? @map("pod_reject_reason_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedBy Int? @map("deleted_by")
+  deletedAt DateTime? @map("deleted_at")
+  @@index([tenantId])
+  @@map("tms_txn_pod")
+}
+
+model Prn {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  prnNo String? @map("prn_no")
+  tenantId Int? @map("tenant_id")
+  officeId Int? @map("office_id")
+  prnDate DateTime? @map("prn_date")
+  driverId Int? @map("driver_id")
+  vehicleId Int? @map("vehicle_id")
+  vehicleNo String? @map("vehicle_no")
+  driverName String? @map("driver_name")
+  driverMobile String? @map("driver_mobile")
+  routeStartLat Decimal? @map("route_start_lat") @db.Decimal(14, 3)
+  routeStartLng Decimal? @map("route_start_lng") @db.Decimal(14, 3)
+  numPickups Int? @map("num_pickups")
+  totalPackages Int? @map("total_packages")
+  estimatedKm Decimal? @map("estimated_km") @db.Decimal(14, 3)
+  prnStatus String? @map("prn_status")
+  startTime DateTime? @map("start_time")
+  endTime DateTime? @map("end_time")
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_prn")
+}
+
+model PrnBookings {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  prnId BigInt? @map("prn_id")
+  bookingId BigInt? @map("booking_id")
+  seqNo Int? @map("seq_no")
+  consignorName String? @map("consignor_name")
+  consignorMobile String? @map("consignor_mobile")
+  pickupAddress String? @map("pickup_address")
+  pickupLatitude Decimal? @map("pickup_latitude") @db.Decimal(14, 3)
+  pickupLongitude Decimal? @map("pickup_longitude") @db.Decimal(14, 3)
+  declaredPackages Int? @map("declared_packages")
+  declaredWeightKg Decimal? @map("declared_weight_kg") @db.Decimal(14, 3)
+  pickupStatus String? @map("pickup_status")
+  packagesPicked Int? @map("packages_picked")
+  actualWeightKg Decimal? @map("actual_weight_kg") @db.Decimal(14, 3)
+  weightVariancePct Decimal? @map("weight_variance_pct") @db.Decimal(14, 3)
+  pickupPhotoUrl String? @map("pickup_photo_url")
+  pickupTime DateTime? @map("pickup_time")
+  lrId BigInt? @map("lr_id")
+  lrGeneratedAt DateTime? @map("lr_generated_at")
+  failReasonId Int? @map("fail_reason_id")
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_prn_bookings")
+}
+
+model PrnLrs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  prnId BigInt? @map("prn_id")
+  lrId BigInt? @map("lr_id")
+  bookingId BigInt? @map("booking_id")
+  seqNo Int? @map("seq_no")
+  pickupAddress String? @map("pickup_address")
+  pickupLat Decimal? @map("pickup_lat") @db.Decimal(14, 3)
+  pickupLng Decimal? @map("pickup_lng") @db.Decimal(14, 3)
+  numPackages Int? @map("num_packages")
+  pickupStatus String? @map("pickup_status")
+  actualPackages Int? @map("actual_packages")
+  pickupTime DateTime? @map("pickup_time")
+  pickupLatActual Decimal? @map("pickup_lat_actual") @db.Decimal(14, 3)
+  pickupLngActual Decimal? @map("pickup_lng_actual") @db.Decimal(14, 3)
+  pickupPhotoUrl String? @map("pickup_photo_url")
+  failReason String? @map("fail_reason")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_prn_lrs")
+}
+
+model RouteMaster {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  companyId Int? @map("company_id")
+  routeCode String? @map("route_code")
+  routeName String? @map("route_name")
+  routeType String? @map("route_type")
+  originOfficeId Int? @map("origin_office_id")
+  destOfficeId Int? @map("dest_office_id")
+  totalStops Int? @map("total_stops")
+  estDistanceKm Decimal? @map("est_distance_km") @db.Decimal(14, 3)
+  estDurationHrs Decimal? @map("est_duration_hrs") @db.Decimal(14, 3)
+  frequency String?
+  vehicleType String? @map("vehicle_type")
+  isActive Boolean? @map("is_active")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_route_master")
+}
+
+model RouteStops {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  routeId Int? @map("route_id")
+  stopSequence Int? @map("stop_sequence")
+  officeId Int? @map("office_id")
+  stopType Int? @map("stop_type")
+  estDistanceKm Decimal? @map("est_distance_km") @db.Decimal(14, 3)
+  estDurationHrs Decimal? @map("est_duration_hrs") @db.Decimal(14, 3)
+  loadingAllowed Boolean? @map("loading_allowed")
+  unloadingAllowed Boolean? @map("unloading_allowed")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy Int? @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_route_stops")
+}
+
+model Trip {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tripNo String? @map("trip_no")
+  tenantId Int? @map("tenant_id")
+  tripType String? @map("trip_type")
+  manifestId BigInt? @map("manifest_id")
+  drsId BigInt? @map("drs_id")
+  originOfficeId Int? @map("origin_office_id")
+  destinationOfficeId Int? @map("destination_office_id")
+  vendorId Int? @map("vendor_id")
+  vehicleId Int? @map("vehicle_id")
+  vehicleNo String? @map("vehicle_no")
+  driverId Int? @map("driver_id")
+  driverName String? @map("driver_name")
+  driverMobile String? @map("driver_mobile")
+  numLrs Int? @map("num_lrs")
+  totalPackages Int? @map("total_packages")
+  tripDate DateTime? @map("trip_date")
+  tripStatus String? @map("trip_status")
+  startTime DateTime? @map("start_time")
+  endTime DateTime? @map("end_time")
+  estimatedKm Decimal? @map("estimated_km") @db.Decimal(14, 3)
+  actualKm Decimal? @map("actual_km") @db.Decimal(14, 3)
+  meterStart Int? @map("meter_start")
+  meterEnd Int? @map("meter_end")
+  freightCharges Decimal? @map("freight_charges") @db.Decimal(14, 3)
+  advancePaid Decimal? @map("advance_paid") @db.Decimal(14, 3)
+  fuelFilledLiters Decimal? @map("fuel_filled_liters") @db.Decimal(14, 3)
+  gpsDeviceId String? @map("gps_device_id")
+  consolidatedEwbNo String? @map("consolidated_ewb_no")
+  cancelReasonId Int? @map("cancel_reason_id")
+  remarks String?
+  routeId Int? @map("route_id")
+  plannedStartTime DateTime? @map("planned_start_time")
+  plannedEndTime DateTime? @map("planned_end_time")
+  actualStartTime DateTime? @map("actual_start_time")
+  actualEndTime DateTime? @map("actual_end_time")
+  delayReasonId Int? @map("delay_reason_id")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  updatedBy Int? @map("updated_by")
+  @@index([tenantId])
+  @@map("tms_txn_trip")
+}
+
+model TripExpenses {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  tripId BigInt? @map("trip_id")
+  driverId Int? @map("driver_id")
+  expenseType String? @map("expense_type")
+  expenseSubtype String? @map("expense_subtype")
+  amount Decimal? @db.Decimal(14, 3)
+  currency String?
+  paymentMode String? @map("payment_mode")
+  location String?
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  receiptUrl String? @map("receipt_url")
+  expenseTime DateTime? @map("expense_time")
+  status String?
+  approvedBy Int? @map("approved_by")
+  approvedAt DateTime? @map("approved_at")
+  rejectReason String? @map("reject_reason")
+  sapExpenseId String? @map("sap_expense_id")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("tms_txn_trip_expenses")
+}
+
+model TripLrs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  tripId BigInt? @map("trip_id")
+  lrId BigInt? @map("lr_id")
+  stopSeq Int? @map("stop_seq")
+  deliveryAddress String? @map("delivery_address")
+  delLat Decimal? @map("del_lat") @db.Decimal(14, 3)
+  delLng Decimal? @map("del_lng") @db.Decimal(14, 3)
+  numPackages Int? @map("num_packages")
+  status String?
+  failReasonId Int? @map("fail_reason_id")
+  deliveryTime DateTime? @map("delivery_time")
+  codAmount Decimal? @map("cod_amount") @db.Decimal(14, 3)
+  codCollected Decimal? @map("cod_collected") @db.Decimal(14, 3)
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("tms_txn_trip_lrs")
+}
+
+
+// ═══════════════════ MODULE: TENANT ═══════════════════
+
+model Currency {
+  id Int @id @default(autoincrement())
+  code String?
+  name String?
+  symbol String?
+  decimalPlaces Int? @map("decimal_places")
+  symbolPosition String? @map("symbol_position")
+  thousandsSeparator String? @map("thousands_separator")
+  decimalSeparator String? @map("decimal_separator")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@map("masterdata_currency")
+}
+
+model FeatureFlags {
+  id Int @id @default(autoincrement())
+  featureKey String? @map("feature_key")
+  moduleName String? @map("module_name")
+  featureName String? @map("feature_name")
+  description String?
+  featureType Boolean? @map("feature_type")
+  defaultValue String? @map("default_value")
+  planRequired String? @map("plan_required")
+  sortOrder Int? @map("sort_order")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@map("masterdata_feature_flags")
+}
+
+model Organizations {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  parentOrganizationId Int? @map("parent_organization_id")
+  orgCode String? @map("org_code")
+  orgName String? @map("org_name")
+  orgNameReg String? @map("org_name_reg")
+  orgType String? @map("org_type")
+  description String?
+  logoUrl String? @map("logo_url")
+  country String?
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_organizations")
+}
+
+model Tenant {
+  id Int @id @default(autoincrement())
+  name String?
+  code String?
+  uuid String
+  timezone String?
+  languageCode String? @map("language_code")
+  logoUrl String? @map("logo_url")
+  description String?
+  country String?
+  state String?
+  city String?
+  pincode String?
+  address String?
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  currencyId Int? @map("currency_id")
+  active Boolean?
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@map("masterdata_tenant")
+}
+
+model TenantFeatureFlags {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  featureFlagId Int? @map("feature_flag_id")
+  featureKey String? @map("feature_key")
+  enabled Boolean?
+  limitValue Int? @map("limit_value")
+  overrideValue String? @map("override_value")
+  validFrom DateTime? @map("valid_from")
+  validUntil DateTime? @map("valid_until")
+  notes String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_tenant_feature_flags")
+}
+
+model TenantKyc {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  legalName String? @map("legal_name")
+  dateOfReg DateTime? @map("date_of_reg")
+  owner1Name String? @map("owner1_name")
+  photo1Url String? @map("photo1_url")
+  owner1Aadhaar String? @map("owner1_aadhaar")
+  owner1AadhaarUrl String? @map("owner1_aadhaar_url")
+  owner1Pan String? @map("owner1_pan")
+  owner1PanUrl String? @map("owner1_pan_url")
+  owner1Email String? @map("owner1_email")
+  owner1Mobile String? @map("owner1_mobile")
+  owner2Name String? @map("owner2_name")
+  photo2Url String? @map("photo2_url")
+  owner2Aadhaar String? @map("owner2_aadhaar")
+  owner2AadhaarUrl String? @map("owner2_aadhaar_url")
+  owner2Pan String? @map("owner2_pan")
+  owner2PanUrl String? @map("owner2_pan_url")
+  owner2Email String? @map("owner2_email")
+  owner2Mobile String? @map("owner2_mobile")
+  gstNum String? @map("gst_num")
+  gstCertUrl String? @map("gst_cert_url")
+  cinNum String? @map("cin_num")
+  companyRegCertUrl String? @map("company_reg_cert_url")
+  panNum String? @map("pan_num")
+  panCardUrl String? @map("pan_card_url")
+  tanNum String? @map("tan_num")
+  tanCardUrl String? @map("tan_card_url")
+  msmeNum String? @map("msme_num")
+  msmeRegCertUrl String? @map("msme_reg_cert_url")
+  aadhaarNum String? @map("aadhaar_num")
+  aadhaarCardUrl String? @map("aadhaar_card_url")
+  country String?
+  state String?
+  district String?
+  taluka String?
+  city String?
+  pincode String?
+  address String?
+  addressReg String? @map("address_reg")
+  addrDocUrl String? @map("addr_doc_url")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  bank1Name String? @map("bank1_name")
+  bank1AccntHolder String? @map("bank1_accnt_holder")
+  bank1AccountType String? @map("bank1_account_type")
+  bank1AccountNum String? @map("bank1_account_num")
+  bank1IfscCode String? @map("bank1_ifsc_code")
+  bank1DocUrl String? @map("bank1_doc_url")
+  bank2Name String? @map("bank2_name")
+  bank2AccntHolder String? @map("bank2_accnt_holder")
+  bank2AccountType String? @map("bank2_account_type")
+  bank2AccountNum String? @map("bank2_account_num")
+  bank2IfscCode String? @map("bank2_ifsc_code")
+  bank2DocUrl String? @map("bank2_doc_url")
+  doc1Name String? @map("doc1_name")
+  doc1Url String? @map("doc1_url")
+  doc1Date DateTime? @map("doc1_date")
+  doc2Name String? @map("doc2_name")
+  doc2Url String? @map("doc2_url")
+  doc2Date DateTime? @map("doc2_date")
+  doc3Name String? @map("doc3_name")
+  doc3Url String? @map("doc3_url")
+  doc3Date DateTime? @map("doc3_date")
+  doc4Name String? @map("doc4_name")
+  doc4Url String? @map("doc4_url")
+  doc4Date DateTime? @map("doc4_date")
+  keyPersonnel1Name String? @map("key_personnel1_name")
+  keyPersonnel1JobTitle String? @map("key_personnel1_job_title")
+  keyPersonnel1Mobile String? @map("key_personnel1_mobile")
+  keyPersonnel1Email String? @map("key_personnel1_email")
+  keyPersonnel2Name String? @map("key_personnel2_name")
+  keyPersonnel2JobTitle String? @map("key_personnel2_job_title")
+  keyPersonnel2Mobile String? @map("key_personnel2_mobile")
+  keyPersonnel2Email String? @map("key_personnel2_email")
+  keyPersonnel3Name String? @map("key_personnel3_name")
+  keyPersonnel3JobTitle String? @map("key_personnel3_job_title")
+  keyPersonnel3Mobile String? @map("key_personnel3_mobile")
+  keyPersonnel3Email String? @map("key_personnel3_email")
+  keyPersonnel4Name String? @map("key_personnel4_name")
+  keyPersonnel4JobTitle String? @map("key_personnel4_job_title")
+  keyPersonnel4Mobile String? @map("key_personnel4_mobile")
+  keyPersonnel4Email String? @map("key_personnel4_email")
+  kycDate DateTime? @map("kyc_date")
+  kycCompleted Boolean? @map("kyc_completed")
+  active Boolean?
+  status String?
+  note String?
+  verificationStatus String? @map("verification_status")
+  verifiedBy Int? @map("verified_by")
+  verifiedAt DateTime? @map("verified_at")
+  expiryDate DateTime? @map("expiry_date")
+  rejectionReason String? @map("rejection_reason")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_tenant_kyc")
+}
+
+
+// ═══════════════════ MODULE: TRACKING ═══════════════════
+
+model Claims {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  claimNo String? @map("claim_no")
+  tenantId Int? @map("tenant_id")
+  incidentId BigInt? @map("incident_id")
+  lrId BigInt? @map("lr_id")
+  customerId Int? @map("customer_id")
+  claimReason String? @map("claim_reason")
+  claimAmount Decimal? @map("claim_amount") @db.Decimal(14, 3)
+  approvedAmount Decimal? @map("approved_amount") @db.Decimal(14, 3)
+  settledAmount Decimal? @map("settled_amount") @db.Decimal(14, 3)
+  claimStatus String? @map("claim_status")
+  reviewedBy Int? @map("reviewed_by")
+  approvedBy Int? @map("approved_by")
+  approvedAt DateTime? @map("approved_at")
+  settledAt DateTime? @map("settled_at")
+  rejectionReason String? @map("rejection_reason")
+  remarks String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_claims")
+}
+
+model ExceptionLogs {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  exceptionCode String? @map("exception_code")
+  severity String?
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  lrId BigInt? @map("lr_id")
+  exceptionTitle String? @map("exception_title")
+  exceptionDetails String? @map("exception_details")
+  triggeredBy String? @map("triggered_by")
+  triggerRefId BigInt? @map("trigger_ref_id")
+  resolutionStatus String? @map("resolution_status")
+  assignedTo Int? @map("assigned_to")
+  resolutionAction String? @map("resolution_action")
+  resolutionAt DateTime? @map("resolution_at")
+  customerNotified Boolean? @map("customer_notified")
+  exceptionImageUrl String? @map("exception_image_url")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_exception_logs")
+}
+
+model IncidentActions {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  incidentId BigInt? @map("incident_id")
+  actionType String? @map("action_type")
+  actionStatus String? @map("action_status")
+  assignedTo Int? @map("assigned_to")
+  dueAt DateTime? @map("due_at")
+  completedAt DateTime? @map("completed_at")
+  remarks String?
+  completedBy Int? @map("completed_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_incident_actions")
+}
+
+model IncidentDocuments {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  incidentId BigInt? @map("incident_id")
+  documentType String? @map("document_type")
+  fileUrl String? @map("file_url")
+  fileName String? @map("file_name")
+  fileSizeKb Int? @map("file_size_kb")
+  remarks String?
+  uploadedBy Int? @map("uploaded_by")
+  uploadedAt DateTime? @map("uploaded_at")
+  verifiedBy Int? @map("verified_by")
+  verifiedAt DateTime? @map("verified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_incident_documents")
+}
+
+model Incidents {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  incidentNo String? @map("incident_no")
+  tenantId Int? @map("tenant_id")
+  incidentTypeId Int? @map("incident_type_id")
+  severity String?
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  lrId BigInt? @map("lr_id")
+  tripId BigInt? @map("trip_id")
+  vehicleId Int? @map("vehicle_id")
+  driverId Int? @map("driver_id")
+  officeId Int? @map("office_id")
+  incidentDatetime DateTime? @map("incident_datetime")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  incidentLocation String? @map("incident_location")
+  description String?
+  reportedBy Int? @map("reported_by")
+  incidentStatus String? @map("incident_status")
+  assignedTo Int? @map("assigned_to")
+  resolutionDeadline DateTime? @map("resolution_deadline")
+  resolvedAt DateTime? @map("resolved_at")
+  resolutionNote String? @map("resolution_note")
+  policeReportNo String? @map("police_report_no")
+  rtoChallanNo String? @map("rto_challan_no")
+  isClaimRequired Boolean? @map("is_claim_required")
+  customerNotified Boolean? @map("customer_notified")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("tms_txn_incidents")
+}
+
+model PackageScanLogs {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  barcodeNo String? @map("barcode_no")
+  lrId BigInt? @map("lr_id")
+  bookingId BigInt? @map("booking_id")
+  bookingItemId BigInt? @map("booking_item_id")
+  scanStage String? @map("scan_stage")
+  scanResult String? @map("scan_result")
+  officeId Int? @map("office_id")
+  tripId BigInt? @map("trip_id")
+  scannedBy Int? @map("scanned_by")
+  scanDeviceId String? @map("scan_device_id")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  scannedAt DateTime? @map("scanned_at")
+  photoUrl String? @map("photo_url")
+  remarks String?
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  @@index([tenantId])
+  @@map("tms_txn_package_scan_logs")
+}
+
+model StatusChangeLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId BigInt? @map("entity_id")
+  entityCode String? @map("entity_code")
+  oldStatus String? @map("old_status")
+  newStatus String? @map("new_status")
+  changedBy Int? @map("changed_by")
+  changedAt DateTime? @map("changed_at")
+  remarks String?
+  systemGenerated Boolean? @map("system_generated")
+  triggerSource String? @map("trigger_source")
+  triggerRefId BigInt? @map("trigger_ref_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("tms_txn_status_change_logs")
+}
+
+model TrackingEvents {
+  id BigInt @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  lrId BigInt? @map("lr_id")
+  tripId BigInt? @map("trip_id")
+  manifestId BigInt? @map("manifest_id")
+  statusCode String? @map("status_code")
+  statusLabel String? @map("status_label")
+  eventType String? @map("event_type")
+  eventSource String? @map("event_source")
+  visibilityToCustomer Boolean? @map("visibility_to_customer")
+  officeId Int? @map("office_id")
+  officeName String? @map("office_name")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  eventTime DateTime? @map("event_time")
+  remarks String?
+  deviceId String? @map("device_id")
+  trackingAccuracy Decimal? @map("tracking_accuracy") @db.Decimal(14, 3)
+  batteryPercentage Int? @map("battery_percentage")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("tms_txn_tracking_events")
+}
+
+model VehicleLocationLogs {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  tripId BigInt? @map("trip_id")
+  vehicleId Int? @map("vehicle_id")
+  driverId Int? @map("driver_id")
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  speedKmph Decimal? @map("speed_kmph") @db.Decimal(14, 3)
+  headingDeg Int? @map("heading_deg")
+  accuracyM Decimal? @map("accuracy_m") @db.Decimal(14, 3)
+  source String?
+  loggedAt DateTime? @map("logged_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy Int? @map("created_by")
+  @@index([tenantId])
+  @@map("tms_txn_vehicle_location_logs")
+}
+
+
+// ═══════════════════ MODULE: VAULT ═══════════════════
+
+model Addresses {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  addressType String? @map("address_type")
+  addressLine1 String? @map("address_line1")
+  addressLine2 String? @map("address_line2")
+  city String?
+  district String?
+  state String?
+  pincode String?
+  country String?
+  latitude Decimal? @db.Decimal(14, 3)
+  longitude Decimal? @db.Decimal(14, 3)
+  isPrimary Boolean? @map("is_primary")
+  geoHierarchyId Int? @map("geo_hierarchy_id")
+  addressReg String? @map("address_reg")
+  proofDocUrl String? @map("proof_doc_url")
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_addresses")
+}
+
+model BankAccounts {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  accountLabel String? @map("account_label")
+  accountHolder String? @map("account_holder")
+  accountNumber String? @map("account_number")
+  accountType String? @map("account_type")
+  bankName String? @map("bank_name")
+  bankCode String? @map("bank_code")
+  ifscCode String? @map("ifsc_code")
+  branchName String? @map("branch_name")
+  branchAddress String? @map("branch_address")
+  micrCode String? @map("micr_code")
+  cancelledChequeUrl String? @map("cancelled_cheque_url")
+  isPrimary Boolean? @map("is_primary")
+  isNachEnabled Boolean? @map("is_nach_enabled")
+  nachRef String? @map("nach_ref")
+  verificationStatus String? @map("verification_status")
+  verifiedAt DateTime? @map("verified_at")
+  verifiedBy Int? @map("verified_by")
+  rejectionReason String? @map("rejection_reason")
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_bank_accounts")
+}
+
+model ContactPersons {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  contactType String? @map("contact_type")
+  salutation String?
+  name String?
+  designation String?
+  department String?
+  mobile String?
+  mobile2 String?
+  email String?
+  email2 String?
+  phone String?
+  whatsapp String?
+  isPrimary Boolean? @map("is_primary")
+  receivesInvoice Boolean? @map("receives_invoice")
+  receivesAlerts Boolean? @map("receives_alerts")
+  canLogin Boolean? @map("can_login")
+  userId Int? @map("user_id")
+  notes String?
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_contact_persons")
+}
+
+model DocumentTypes {
+  id Int @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  docCode String? @map("doc_code")
+  name String?
+  nameReg String? @map("name_reg")
+  description String?
+  isRequired Boolean? @map("is_required")
+  hasExpiry Boolean? @map("has_expiry")
+  reminderDays Int? @map("reminder_days")
+  allowsMultiple Boolean? @map("allows_multiple")
+  acceptedFormats String? @map("accepted_formats")
+  maxFileSizeMb Int? @map("max_file_size_mb")
+  sortOrder Int? @map("sort_order")
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_document_types")
+}
+
+model DocumentVerifications {
+  id BigInt @id @default(autoincrement())
+  tenantId Int? @map("tenant_id")
+  documentId Int? @map("document_id")
+  documentTypeId Int? @map("document_type_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  action String?
+  actionBy Int? @map("action_by")
+  actionAt DateTime? @map("action_at")
+  remarks String?
+  previousStatus String? @map("previous_status")
+  newStatus String? @map("new_status")
+  docUrlSnapshot String? @map("doc_url_snapshot")
+  expiryDate DateTime? @map("expiry_date")
+  verificationMethod String? @map("verification_method")
+  ipAddress String? @map("ip_address")
+  approvalRequestId Int? @map("approval_request_id")
+  createdBy Int? @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([tenantId])
+  @@map("masterdata_document_verifications")
+}
+
+model Documents {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  documentTypeId Int? @map("document_type_id")
+  fileName String? @map("file_name")
+  fileUrl String? @map("file_url")
+  mimeType String? @map("mime_type")
+  fileSizeKb Int? @map("file_size_kb")
+  documentVersion Int? @map("document_version")
+  expiryDate DateTime? @map("expiry_date")
+  uploadedBy Int? @map("uploaded_by")
+  active Boolean?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId])
+  @@map("masterdata_documents")
+}
+
+model TaxRegistrations {
+  id Int @id @default(autoincrement())
+  uuid String
+  tenantId Int? @map("tenant_id")
+  entityType String? @map("entity_type")
+  entityId Int? @map("entity_id")
+  regType String? @map("reg_type")
+  regNumber String? @map("reg_number")
+  regName String? @map("reg_name")
+  state String?
+  regDate DateTime? @map("reg_date")
+  expiryDate DateTime? @map("expiry_date")
+  docUrl String? @map("doc_url")
+  docTypeId Int? @map("doc_type_id")
+  isPrimary Boolean? @map("is_primary")
+  verificationStatus String? @map("verification_status")
+  verifiedAt DateTime? @map("verified_at")
+  verifiedBy Int? @map("verified_by")
+  rejectionReason String? @map("rejection_reason")
+  reminderDays Int? @map("reminder_days")
+  status String?
+  createdBy Int? @map("created_by")
+  updatedBy Int? @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy Int? @map("deleted_by")
+  @@index([tenantId, status])
+  @@map("masterdata_tax_registrations")
+}

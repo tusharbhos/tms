@@ -1,0 +1,42 @@
+import { z } from 'zod';
+
+// CREATE DTO for txn_trip — validated business fields only.
+export const CreateTripSchema = z.object({
+  tripNo: z.string().optional().nullable(),
+  tripType: z.string().optional().nullable(),
+  manifestId: z.number(),
+  drsId: z.number(),
+  originOfficeId: z.number(),
+  destinationOfficeId: z.number(),
+  vendorId: z.number(),
+  vehicleId: z.number(),
+  vehicleNo: z.string().optional().nullable(),
+  driverId: z.number(),
+  driverName: z.string().optional().nullable(),
+  driverMobile: z.string().optional().nullable(),
+  numLrs: z.number().optional().nullable(),
+  totalPackages: z.number().optional().nullable(),
+  tripDate: z.coerce.date().optional().nullable(),
+  tripStatus: z.string().optional().nullable(),
+  startTime: z.coerce.date().optional().nullable(),
+  endTime: z.coerce.date().optional().nullable(),
+  estimatedKm: z.number().optional().nullable(),
+  actualKm: z.number().optional().nullable(),
+  meterStart: z.number().optional().nullable(),
+  meterEnd: z.number().optional().nullable(),
+  freightCharges: z.number().optional().nullable(),
+  advancePaid: z.number().optional().nullable(),
+  fuelFilledLiters: z.number().optional().nullable(),
+  gpsDeviceId: z.string(),
+  consolidatedEwbNo: z.string().optional().nullable(),
+  cancelReasonId: z.number(),
+  remarks: z.string().optional().nullable(),
+  routeId: z.number(),
+  plannedStartTime: z.coerce.date().optional().nullable(),
+  plannedEndTime: z.coerce.date().optional().nullable(),
+  actualStartTime: z.coerce.date().optional().nullable(),
+  actualEndTime: z.coerce.date().optional().nullable(),
+  delayReasonId: z.number(),
+});
+
+export type CreateTripDto = z.infer<typeof CreateTripSchema>;

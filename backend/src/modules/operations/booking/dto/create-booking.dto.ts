@@ -1,0 +1,43 @@
+import { z } from 'zod';
+
+// CREATE DTO for txn_booking — validated business fields only.
+export const CreateBookingSchema = z.object({
+  bookingNo: z.string().optional().nullable(),
+  companyId: z.number(),
+  bookingOfficeId: z.number(),
+  customerId: z.number(),
+  consignorId: z.number(),
+  consigneeId: z.number(),
+  billingPartyId: z.number(),
+  contractId: z.number(),
+  pickupAddressId: z.number(),
+  deliveryAddressId: z.number(),
+  originHubId: z.number(),
+  destinationHubId: z.number(),
+  originPincode: z.string().optional().nullable(),
+  destinationPincode: z.string().optional().nullable(),
+  isOda: z.boolean().optional().nullable(),
+  paymentType: z.string().optional().nullable(),
+  pickupType: z.string().optional().nullable(),
+  deliveryType: z.string().optional().nullable(),
+  loadType: z.string().optional().nullable(),
+  deliverySpeed: z.string().optional().nullable(),
+  priority: z.string().optional().nullable(),
+  bookingDate: z.coerce.date().optional().nullable(),
+  expectedPickupAt: z.coerce.date().optional().nullable(),
+  expectedDeliveryAt: z.coerce.date().optional().nullable(),
+  specialInstructions: z.string().optional().nullable(),
+  bookingStatus: z.string().optional().nullable(),
+  cancelReasonId: z.number(),
+  cancelNotes: z.string().optional().nullable(),
+  refNum: z.string().optional().nullable(),
+  ewaybillRequired: z.boolean().optional().nullable(),
+  bookingFlowType: z.string().optional().nullable(),
+  bookingSource: z.string().optional().nullable(),
+  isDirectLr: z.boolean().optional().nullable(),
+  actualPickupAt: z.coerce.date().optional().nullable(),
+  verifiedBy: z.number().optional().nullable(),
+  actualWeightVerifiedAt: z.coerce.date().optional().nullable(),
+});
+
+export type CreateBookingDto = z.infer<typeof CreateBookingSchema>;
