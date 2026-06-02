@@ -3,7 +3,7 @@ import { BookingItemsModule } from './booking-items/booking-items.module';
 import { BookingChargesModule } from './booking-charges/booking-charges.module';
 import { LrModule } from './lr/lr.module';
 import { EwaybillModule } from './ewaybill/ewaybill.module';
-import { PrnModule } from './prn/prn.module';
+import { PrnModule } from './prns/prns.module';
 import { PrnLrsModule } from './prn-lrs/prn-lrs.module';
 import { ManifestModule } from './manifest/manifest.module';
 import { ManifestLrsModule } from './manifest-lrs/manifest-lrs.module';
