@@ -38,7 +38,7 @@ export class ApiWebhookLogsController {
     return this.service.findAll(tenantId, query);
   }
 
-  @Get(':id')
+  @Get(':id(\\d+)')
   findOne(@CurrentTenant() tenantId: number, @Param('id') id: string) {
     return this.service.findOne(tenantId, id);
   }
@@ -82,7 +82,7 @@ export class ApiWebhookLogsController {
     @Query() query: any,
     @Res() res: any,
   ) {
-    const result: any = await this.service.findAll(tenantId, { ...query, size: 10000 });
+    const result: any = await this.service.findAll(tenantId, this.excelService.normalizeExportQuery(query));
     const rows = Array.isArray(result) ? result : (result?.data ?? result?.rows ?? []);
     const buf = await this.excelService.buildExport(this.excelSheetName, this.excelColumns, rows);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -6,12 +6,15 @@ import { map, Observable } from 'rxjs';
 export class TransformInterceptor implements NestInterceptor {
   intercept(_ctx: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data: JSON.parse(JSON.stringify(data, (_k, v) =>
-          typeof v === 'bigint' ? v.toString() : v,
-        )),
-      })),
+      map((data) => {
+        if (data === undefined) return data;
+        return {
+          success: true,
+          data: JSON.parse(JSON.stringify(data, (_k, v) =>
+            typeof v === 'bigint' ? v.toString() : v,
+          )),
+        };
+      }),
     );
   }
 }

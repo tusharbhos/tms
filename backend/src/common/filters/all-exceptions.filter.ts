@@ -11,6 +11,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const payload = exception instanceof HttpException
       ? exception.getResponse()
       : { message: 'Internal server error' };
+    if (res.headersSent) return;
     res.status(status).json({ success: false, statusCode: status, error: payload });
   }
 }

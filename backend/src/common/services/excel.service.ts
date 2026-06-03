@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, StreamableFile } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 
 /**
@@ -26,6 +26,18 @@ export interface ColumnDef {
 
 @Injectable()
 export class ExcelService {
+  normalizeExportQuery(query: any): any {
+    const normalized = { ...(query ?? {}) };
+    normalized.page = Number(normalized.page ?? 1);
+    normalized.size = Number(normalized.size ?? 10000);
+    if (!Number.isFinite(normalized.page) || normalized.page < 1) normalized.page = 1;
+    if (!Number.isFinite(normalized.size) || normalized.size < 1) normalized.size = 10000;
+    if (normalized.includeDeleted !== undefined) {
+      normalized.includeDeleted = ['true', '1', 'yes', 'y'].includes(String(normalized.includeDeleted).toLowerCase());
+    }
+    return normalized;
+  }
+
   /** Build a blank Excel template — headers + one sample row + a notes sheet. */
   async buildTemplate(sheetName: string, columns: ColumnDef[]): Promise<Buffer> {
     const wb = new ExcelJS.Workbook();
@@ -86,6 +98,7 @@ export class ExcelService {
         let v = r[c.key];
         if (v && typeof v === 'object' && v.toISOString) v = v.toISOString().slice(0, 10);
         if (typeof v === 'bigint') v = v.toString();
+        if (v && typeof v === 'object') v = v.toString ? v.toString() : JSON.stringify(v);
         flat[c.key] = v ?? '';
       });
       ws.addRow(flat);

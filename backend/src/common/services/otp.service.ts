@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { randomInt } from 'crypto';
+import * as bcrypt from 'bcryptjs';
 
 /**
  * OTP service — reusable.
@@ -20,23 +21,24 @@ export class OtpService {
   /** Generate + store + deliver an OTP. Returns the OTP id (NOT the code). */
   async generate(params: {
     userId?: number;
+    tenantId?: number;
+    loginId?: string;
     mobile?: string;
     email?: string;
     purpose: 'LOGIN' | 'VERIFY_MOBILE' | 'VERIFY_EMAIL' | 'RESET_PASSWORD' | 'POD_DELIVERY';
   }): Promise<{ otpId: number; expiresAt: Date }> {
     const code = String(randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + this.TTL_MIN * 60 * 1000);
+    const otpHash = `${params.purpose}:${await bcrypt.hash(code, 10)}`;
 
     const row = await (this.prisma as any).userOtps.create({
       data: {
         userId: params.userId ?? null,
-        mobile: params.mobile ?? null,
-        email: params.email ?? null,
-        purpose: params.purpose,
-        otpCode: code,
+        tenantId: params.tenantId ?? null,
+        loginId: params.loginId ?? null,
+        otpHash,
         expiresAt,
-        attempts: 0,
-        isConsumed: false,
+        failedOtpLoginAttempts: 0,
         createdAt: new Date(),
       },
     });
@@ -53,28 +55,44 @@ export class OtpService {
       this.logger.warn(`🔓 DEV: OTP for ${params.mobile ?? params.email ?? 'user ' + params.userId} = ${code}`);
     }
 
-    return { otpId: row.id, expiresAt };
+    return { otpId: Number(row.id), expiresAt };
   }
 
   /** Verify a code. Throws on invalid/expired/too-many-attempts. */
   async verify(otpId: number, code: string): Promise<{ userId?: number; mobile?: string; email?: string; purpose: string }> {
-    const row: any = await (this.prisma as any).userOtps.findUnique({ where: { id: otpId } });
+    const row: any = await (this.prisma as any).userOtps.findUnique({ where: { id: BigInt(otpId) } });
     if (!row) throw new BadRequestException('Invalid OTP');
-    if (row.isConsumed) throw new BadRequestException('OTP already used');
+    if (row.deletedAt || !row.otpHash) throw new BadRequestException('OTP already used');
     if (row.expiresAt < new Date()) throw new BadRequestException('OTP expired');
-    if (row.attempts >= this.MAX_ATTEMPTS) throw new BadRequestException('Too many attempts');
+    if (row.otpLoginBlockedTill && row.otpLoginBlockedTill > new Date()) {
+      throw new BadRequestException('OTP login blocked temporarily');
+    }
+    if ((row.failedOtpLoginAttempts ?? 0) >= this.MAX_ATTEMPTS) throw new BadRequestException('Too many attempts');
 
-    if (row.otpCode !== code) {
+    const separator = row.otpHash.indexOf(':');
+    const purpose = separator > 0 ? row.otpHash.slice(0, separator) : 'LOGIN';
+    const hash = separator > 0 ? row.otpHash.slice(separator + 1) : row.otpHash;
+    const ok = await bcrypt.compare(code, hash);
+
+    if (!ok) {
+      const attempts = (row.failedOtpLoginAttempts ?? 0) + 1;
       await (this.prisma as any).userOtps.update({
-        where: { id: otpId }, data: { attempts: { increment: 1 } },
+        where: { id: row.id },
+        data: {
+          failedOtpLoginAttempts: { increment: 1 },
+          otpLoginBlockedTill: attempts >= this.MAX_ATTEMPTS
+            ? new Date(Date.now() + this.TTL_MIN * 60 * 1000)
+            : null,
+        },
       });
       throw new BadRequestException('Wrong OTP');
     }
 
     await (this.prisma as any).userOtps.update({
-      where: { id: otpId }, data: { isConsumed: true, consumedAt: new Date() },
+      where: { id: row.id },
+      data: { otpHash: null, deletedAt: new Date() },
     });
 
-    return { userId: row.userId, mobile: row.mobile, email: row.email, purpose: row.purpose };
+    return { userId: row.userId, purpose };
   }
 }

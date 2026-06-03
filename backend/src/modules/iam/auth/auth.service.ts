@@ -133,9 +133,9 @@ export class AuthService {
     if (!dto.mobile && !dto.email) {
       throw new BadRequestException('Provide mobile or email');
     }
-    let userId: number | undefined;
+    let user: any | null = null;
     if (dto.mobile || dto.email) {
-      const u: any = await (this.prisma as any).users.findFirst({
+      user = await (this.prisma as any).users.findFirst({
         where: {
           OR: [
             dto.mobile ? { mobile: dto.mobile } : undefined,
@@ -145,10 +145,17 @@ export class AuthService {
           deletedAt: null,
         },
       });
-      userId = u?.id;
+    }
+    if (!user) {
+      throw new BadRequestException('No active user found for this mobile/email');
     }
     const { otpId, expiresAt } = await this.otp.generate({
-      userId, mobile: dto.mobile, email: dto.email, purpose: dto.purpose,
+      userId: user.id,
+      tenantId: user.tenantId,
+      loginId: user.loginId,
+      mobile: dto.mobile,
+      email: dto.email,
+      purpose: dto.purpose,
     });
     return { otpId, expiresAt, message: 'OTP sent. Check console in dev mode.' };
   }
